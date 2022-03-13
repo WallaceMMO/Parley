@@ -34,7 +34,7 @@ export class User extends BaseEntity{
     nameUser: string;
 
     @Column()
-    descriptionUser: string
+    descriptionUser: string    
 
     @Column()
     gloryUser: number

@@ -18,8 +18,8 @@ export enum UserTypes {
     TOKEN_AUTHENTICATE_SUCCESS = '@user/TOKEN_AUTHENTICATE_SUCCESS',
     TOKEN_AUTHENTICATE_ERROR = '@user/TOKEN_AUTHENTICATE_ERROR',
 
+    CHANGE_PHOTOPROFILE = '@user/CHANGE_PHOTOPROFILE',
     CHANGE_THEME = '@config/CHANGE_THEME'
-
 }
 
 export interface User {
@@ -27,7 +27,7 @@ export interface User {
     nameUser: string
     descriptionUser: string
     emailUser: string
-    photoProfileUser: Buffer
+    photoProfileUser: string
     passwordUser: string
 
     themeActive: string

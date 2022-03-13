@@ -17,7 +17,8 @@ const Profile = () => {
             <Link href={`user/${user?.idUser}`}>
                 <div>
                     <IconPhotoProfile 
-                        size={40}                    
+                        size={40}
+                        src={user?.photoProfileUser}
                     />
                     <LabelName>{user?.nameUser}</LabelName>
                 </div>

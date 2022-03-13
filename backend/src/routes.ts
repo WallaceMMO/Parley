@@ -20,6 +20,7 @@ routes.get('/user/read/:id', UserController.one)
 routes.get('/user/read', UserController.all)
 routes.post('/user/auth', UserController.auth)
 routes.post('/user/save', UserController.save)
+routes.post('/user/changephoto/:id', UserController.changePhotoProfile)
 
 //Debate
 routes.get('/debate/read', DebateController.all)

@@ -21,6 +21,7 @@ const reducer: Reducer<UserState> = (state = INITIAL_STATE, action) => {
         case UserTypes.LOGIN_REQUEST:
         case UserTypes.READONE_REQUEST:
         case UserTypes.TOKEN_AUTHENTICATE:  
+        case UserTypes.CHANGE_PHOTOPROFILE:  
           return { ...state, loading: true };
 
         case UserTypes.LOGIN_SUCCESS:
@@ -38,8 +39,7 @@ const reducer: Reducer<UserState> = (state = INITIAL_STATE, action) => {
           ...state, loading: true, user: action.payload.user
           };
 
-        case UserTypes.READONE_SUCCESS:
-          
+        case UserTypes.READONE_SUCCESS:          
           return {
           ...state, loading: true, userSelected: action.payload.user
           };

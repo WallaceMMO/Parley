@@ -62,6 +62,7 @@ class UserController {
                 mostViewedDebate: user.proDebatesUser[mostViewedCon].debateSideDebate.quantityViews
                                 > user.proDebatesUser[mostViewedPro].debateSideDebate.quantityViews ? user.proDebatesUser[mostViewedCon].debateSideDebate : user.proDebatesUser[mostViewedPro].debateSideDebate,
                 madeDebates: user.proDebatesUser.length + user.proDebatesUser.length,
+                photoProfileUser: user.photoProfileUser.toString()
             } 
         });
     }
@@ -158,6 +159,33 @@ class UserController {
             await userRepository.save(user);
         
             return response.send({ user, token });
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    async changePhotoProfile(request: Request, response: Response, next: NextFunction) {
+        const userRepository = getRepository(User);
+        
+        try {
+            
+            const { photo } =
+              request.body;
+           
+            const userexists = await userRepository.findOne({ 
+                where: { 
+                    idUser: request.params.id
+                } 
+            });
+            
+            if (!userexists)
+              return response.status(209).send({ error: "id doesn't exists" });                                       
+    
+            userexists.photoProfileUser = photo
+
+            await userRepository.update(userexists.idUser, userexists)
+                        
+            return response.send({ user: userexists });
         } catch (error) {
             console.error(error)
         }

@@ -14,6 +14,9 @@ class DebateController {
     async all(request: Request, response: Response, next: NextFunction) {
         const debateRepository = getRepository(Debate);
 
+        const page = parseInt(request.query.page as any) || 1;
+        const take = 3;
+
         try {
             const debates = await debateRepository.createQueryBuilder("debate")                
                 .leftJoinAndSelect("debate.messagesDebate", "message")                
@@ -23,7 +26,9 @@ class DebateController {
                 .leftJoinAndSelect("message.sideDebateMessage", "sidedebatemessage")
                 .leftJoinAndSelect("sidedebatemessage.userSideDebate", "usersidedebate")
                 .loadRelationCountAndMap("debate.quantityViews", 'debate.viewsDebate')
-                .getMany()                
+                .offset((page - 1) * take)
+                .limit(take)
+                .getMany()
 
             return response.send({ debates });            
         } catch (error) {

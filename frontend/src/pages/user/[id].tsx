@@ -15,6 +15,7 @@ import TabNavigation from "../../components/organisms/TabNavigation";
 import DebatesMade from "../../components/organisms/ItemsBodyGroup/DebatesMade";
 import ListGroups from "../../components/organisms/ListGroups";
 import TableListGroups from "../../components/organisms/TableListGroups";
+import MainProfile from "../../components/templates/MainProfile";
 
 export const getStaticProps: GetStaticProps = async (context) => {
     const id = context.params?.id
@@ -66,25 +67,33 @@ const UserDetail: NextPage<Props> = ({id}) => {
         <Container>            
             <Header />
             
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '78%',
+                marginTop: 26
+            }}>
+            <MainProfile />
             <ContainerItem>
-                <TabNavigation 
-                    selectedIndex={selectedIndex}
-                    names={tabs}
-                    setSelectedIndex={setSelectedIndex}
-                />
-                
-                {
-                    selectedIndex == 'Visão Geral' && <OverviewUser />
-                }
+                    <TabNavigation 
+                        selectedIndex={selectedIndex}
+                        names={tabs}
+                        setSelectedIndex={setSelectedIndex}
+                    />
+                    
+                    {
+                        selectedIndex == 'Visão Geral' && <OverviewUser />
+                    }
 
-                {
-                    selectedIndex == 'Debates' && <DebatesMade debates={debates}/>
-                }
+                    {
+                        selectedIndex == 'Debates' && <DebatesMade debates={debates}/>
+                    }
 
-                {
-                    selectedIndex == 'Grupos' && <TableListGroups groups={groups}/>
-                }
+                    {
+                        selectedIndex == 'Grupos' && <TableListGroups groups={groups}/>
+                    }
             </ContainerItem>
+            </div>
         </Container>
     )
     
@@ -97,11 +106,11 @@ export const Container = styled.div`
 `;
 
 export const ContainerItem = styled.div`
-  width: 78%;
+  width: 100%;
   height: 645px;
 
   background-color: ${({theme}) => theme.white};
-  margin-top: 26px;
+  margin-left: 10px;
   display: flex;
   flex-direction: column;
 `

@@ -1,7 +1,7 @@
 import {all, takeLatest} from 'redux-saga/effects'
 
 import {UserTypes} from './user/types'
-import {login, readList, readOneUser, register, verifyToken} from './user/saga'
+import {changePhotoProfileUser, login, readList, readOneUser, register, verifyToken} from './user/saga'
 
 import {DebateTypes} from './debate/types'
 import {addMessage, createDebate, FindByGroupDebate, FindByUserDebate, loadOneDebate, read} from './debate/saga'
@@ -27,6 +27,8 @@ export default function* rootSaga() {
         takeLatest(UserTypes.READLIST_REQUEST, readList),
 
         takeLatest(UserTypes.READONE_REQUEST, readOneUser),
+
+        takeLatest(UserTypes.CHANGE_PHOTOPROFILE, changePhotoProfileUser),
 
 
         takeLatest(DebateTypes.READ_REQUEST, read),
