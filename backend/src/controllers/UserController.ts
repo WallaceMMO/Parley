@@ -5,7 +5,9 @@ import bcrypt from 'bcryptjs'
 
 import {User} from '../entities/User'
 import {Debate} from '../entities/Debate'
+import { validate } from 'class-validator';
 
+import {returnValidateErrorString} from '../helpers/returnValidationError'
 class UserController {
     async index(request: Request, response: Response, next: NextFunction) {
         try {
@@ -30,8 +32,7 @@ class UserController {
         }
     }
 
-    async one(request: Request, response: Response, next: NextFunction) {
-        
+    async one(request: Request, response: Response, next: NextFunction) {        
         const userRepository = getRepository(User);
         const user = await userRepository.createQueryBuilder("user")
             .leftJoinAndSelect("user.patentMembersUser", "patentMember")
@@ -56,38 +57,50 @@ class UserController {
                             > user.proDebatesUser[mostViewedPro].debateSideDebate.quantityViews ? i : mostViewedPro
         }
                 
+        let mostViewedDebate 
+
+        if(user.proDebatesUser[mostViewedCon])
+            mostViewedDebate = user.proDebatesUser[mostViewedCon].debateSideDebate.quantityViews
+              > user.proDebatesUser[mostViewedPro].debateSideDebate.quantityViews ? 
+                user.proDebatesUser[mostViewedCon].debateSideDebate : 
+                user.proDebatesUser[mostViewedPro].debateSideDebate 
+
         return response.send({ 
             user: {
                 ...user,
-                mostViewedDebate: user.proDebatesUser[mostViewedCon].debateSideDebate.quantityViews
-                                > user.proDebatesUser[mostViewedPro].debateSideDebate.quantityViews ? user.proDebatesUser[mostViewedCon].debateSideDebate : user.proDebatesUser[mostViewedPro].debateSideDebate,
+                mostViewedDebate,
                 madeDebates: user.proDebatesUser.length + user.proDebatesUser.length,
+                photoProfileUser: user.photoProfileUser?.toString()
             } 
         });
-    }
+    }    
 
     async auth(request: Request, response: Response, next: NextFunction) {
         const userRepository = getRepository(User)                
-        
+                
         try {            
             const {emailUser, passwordUser} = request.body.user as User
-        
-            if(!passwordUser) {
-                return response.status(204).send({error: "userpassword undefined"})
+                    
+            console.log('apareça aqui')
+            if(!passwordUser || passwordUser == '') {
+                return response.send({error: "userpassword undefined"})
             }
-            if(!emailUser) {
-                return response.status(204).send({error: "useremail undefined"})
+            if(!emailUser || emailUser == '') {
+                return response.send({error: "useremail undefined"})
             }
             
-            const user = await userRepository.findOne({
-                where: {emailUser}
+            const user = await userRepository.createQueryBuilder("user")
+            .leftJoinAndSelect("user.patentMembersUser", "patent")
+            .where("user.emailUser = :emailUser", {
+                emailUser
             })
+            .getOne()
     
             if(!user) {
                 return response.status(208).send({error: "useremail not found"})
             }
     
-            const isValidPassword = await bcrypt.compare(
+            const isValidPassword = await bcrypt.compareSync(
                 passwordUser,
                 user.passwordUser
             )
@@ -121,19 +134,7 @@ class UserController {
         try {
             
             const { nameUser, passwordUser, photoProfileUser, emailUser } =
-              request.body.user as User;
-                
-            if(!emailUser) {
-                return response.status(204).send({error: "useremail undefined"})
-            }
-    
-            if(!nameUser) {
-                return response.status(204).send({error: "nameUser undefined"})
-            }
-    
-            if(!passwordUser) {
-                return response.status(204).send({error: "passwordUser undefined"})
-            }        
+              request.body.user as User;                            
         
             const userexists = await userRepository.findOne({ where: { emailUser } });
             
@@ -145,19 +146,49 @@ class UserController {
                 nameUser,
                 passwordUser,
                 photoProfileUser,
-                activityUser: new Date,
-                descriptionUser: '',
-                gloryUser: 0,
-                honorUser: 0,
-                followersUser: 0,
+                descriptionUser: ''                
             });
     
+            const errors = await validate(user)
+                
+            console.log({error: returnValidateErrorString(errors[0])})
+            if(errors.length > 0) {
+                return response.send({error: returnValidateErrorString(errors[0])})
+            }
+
             const token = jwt.sign({id: user.idUser}, "secret", {
                 expiresIn: "1d"
             })
             await userRepository.save(user);
         
             return response.send({ user, token });
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    async changePhotoProfile(request: Request, response: Response, next: NextFunction) {
+        const userRepository = getRepository(User);
+        
+        try {
+            
+            const { photo } =
+              request.body;
+           
+            const userexists = await userRepository.findOne({ 
+                where: { 
+                    idUser: request.params.id
+                } 
+            });
+            
+            if (!userexists)
+              return response.status(209).send({ error: "id doesn't exists" });                                       
+    
+            userexists.photoProfileUser = photo
+
+            await userRepository.update(userexists.idUser, userexists)
+                        
+            return response.send({ user: userexists });
         } catch (error) {
             console.error(error)
         }

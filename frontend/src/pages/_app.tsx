@@ -11,11 +11,8 @@ import * as UserActions from '../store/ducks/user/actions'
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 
-function App({ Component, pageProps }: AppProps) {
-  const dispatch = useDispatch()
-  const user = useSelector((state) => state.userReducer.user)
+function App({ Component, pageProps }: AppProps) {  
   
-
   return(  
     <>
         <GlobalStyles />

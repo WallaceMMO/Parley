@@ -2,22 +2,92 @@ import {action} from 'typesafe-actions'
 import {GroupTypes, Group, ItemChat} from './types'
 import {User} from '../user/types'
 import { Socket } from 'socket.io-client'
+import { NotificationGroup, NotificationGroupType, Situation } from '../notificationGroup/types'
+import { NotificationStatus } from '../notification/types'
 
-export const loadRequest = () => {
-    return action(GroupTypes.LOAD_GROUPS)
+export const loadGroupsRequest = () => {
+    return action(GroupTypes.REQUEST_LOAD_GROUPS)
 }
 
-export const successLoadRequest = (groups: Group[]) => {
+export const loadGroupsSuccess = (groups: Group[]) => {
     return action(GroupTypes.SUCCESS_LOAD_GROUPS, { groups })
 }
 
-export const successLoadOneRequest = (group: Group) => {
-    return action(GroupTypes.SUCCESS_LOAD_GROUP, { group })
+
+export const loadGroupSelectedRequest = (idGroup: number) => {
+    return action(GroupTypes.REQUEST_LOAD_GROUPSELECTED, { idGroup })
+}
+
+export const loadGroupSelectedSuccess = (group: Group) => {
+    return action(GroupTypes.SUCCESS_LOAD_GROUPSELECTED, { group })
+}
+
+
+export const loadGroupsRecruitRequest = (idGroup: number) => {
+    return action(GroupTypes.REQUEST_LOAD_GROUPSRECRUIT, { idGroup })
+}
+
+export const loadGroupsRecruitSuccess = (groups: Group[]) => {
+    return action(GroupTypes.SUCCESS_LOAD_GROUPSRECRUIT, { groups })
+}
+
+
+export const loadUsersRecruitRequest = ({
+    idGroup, 
+    typeNotificationGroup,
+    statusNotificationGroup,    
+}: {
+    idGroup: number
+    typeNotificationGroup: NotificationGroupType,
+    statusNotificationGroup: NotificationStatus,
+}) => {
+    return action(GroupTypes.REQUEST_LOAD_USERSRECRUIT, { idGroup, typeNotificationGroup, statusNotificationGroup })
+}
+
+export const loadUsersRecruitSuccess = (users: User[]) => {
+    return action(GroupTypes.SUCCESS_LOAD_USERSRECRUIT, { users })
+}
+
+
+export const loadUsersSolicitationRequest = ({
+    idGroup,
+    statusNotificationGroup
+}: {
+    idGroup: number
+    statusNotificationGroup: NotificationStatus
+}) => {
+    return action(GroupTypes.REQUEST_LOAD_USERSSOLICITATION, { idGroup, statusNotificationGroup })
+}
+
+export const loadUsersSolicitationSuccess = (users: User[]) => {
+    return action(GroupTypes.SUCCESS_LOAD_USERSSOLICITATION, { users })
+}
+
+export const loadGroupsInviteRequest = ({
+    idGroup,
+    statusNotificationGroup
+}: {
+    idGroup: number
+    statusNotificationGroup: NotificationStatus
+}) => {
+    return action(GroupTypes.REQUEST_LOAD_GROUPSINVITES, { idGroup, statusNotificationGroup })
+}
+
+export const loadGroupsInviteSuccess = (groups: Group[]) => {
+    return action(GroupTypes.SUCCESS_LOAD_GROUPSINVITES, { groups })
 }
 
 export const failureLoadRequest = (error: string) => action(GroupTypes.FAILURE_GROUPS, {error})
 
-export const loadOneRequest = (id: string) => action(GroupTypes.LOAD_ONE_REQUEST, {id})
+export const ChangedSituationNotificationGroup = ({notificationGroup, situationNotificationGroup, idGroup, idUser}: {
+    notificationGroup: NotificationGroup,
+    situationNotificationGroup: Situation,
+
+    idGroup?: number
+    idUser?: number
+}) => {
+    return action(GroupTypes.CHANGEDSITUATIONUSERORGROUP, {notificationGroup, situationNotificationGroup, idGroup, idUser})
+}
 
 interface CreateGroup {    
     nameGroup: string;

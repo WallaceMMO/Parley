@@ -1,6 +1,5 @@
 import {action} from 'typesafe-actions'
 import {UserTypes, User} from './types'
-import Link from 'next/link'
 
 interface RegisterProps {
     nameUser: string
@@ -28,9 +27,15 @@ export const loginSuccess = (user: User) => {
     return action(UserTypes.LOGIN_SUCCESS, { user })
 }
 
-export const loginFailure = (error: string) => action(UserTypes.LOGIN_FAILURE, {error})
+export const loginFailure = (error: string | null) => action(UserTypes.LOGIN_FAILURE, {error})
 
 export const changeTheme = () => action(UserTypes.CHANGE_THEME)
+
+interface IChangePhoto {
+    base64: string | null | ArrayBuffer
+    idUser: number
+}
+export const changePhotoProfile = ({base64, idUser}: IChangePhoto) => action(UserTypes.CHANGE_PHOTOPROFILE, {base64, idUser})
 
 export const tokenAuthenticateRequest = () => {    
     return action(UserTypes.TOKEN_AUTHENTICATE)

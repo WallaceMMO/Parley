@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import Router from 'next/router'
+import React, { useEffect, useRef, useState, CSSProperties } from "react";
+
+import ContainerNotifications from '../../../components/organisms/ContainerNotifications'
 
 import {
     Circle,
@@ -8,10 +9,9 @@ import {
     LabelUnread,
     SectionIconNotification,
     ContentHeader,
-    SectionProfile
+    SectionProfile,    
 } from './styles'
 
-import NotificationBar from '../../molecules/NotificationBar'
 
 import * as UserActions from '../../../store/ducks/user/actions'
 import * as NotificationActions from '../../../store/ducks/notification/actions'
@@ -23,6 +23,8 @@ import Profile from "../../molecules/Profile";
 function HeaderComponent() {    
     const dispatch = useDispatch()
 
+    const [visibilityContainerNotifications, setVisibilityContainerNotifications] = useState(false)
+    
     const user = useSelector((state) => state.userReducer.user)    
     const quantityUnread = useSelector((state) => state.notificationReducer.quantityUnread)    
 
@@ -33,14 +35,21 @@ function HeaderComponent() {
     useEffect(() => {
         if(user)
             dispatch(NotificationActions.getUnreadRequest(user.idUser))
-    }, [user])
+    }, [user])    
+
+    function showContainer() {
+        setVisibilityContainerNotifications(!visibilityContainerNotifications)
+    }
 
     return (        
         <Header>           
             <ContentHeader>
                 <ButtonsPanel />   
                 <SectionProfile>
-                    <SectionIconNotification onClick={() => Router.push('/notifications')}>
+                    <ContainerNotifications 
+                    visibility={visibilityContainerNotifications}
+                    setVisibility={setVisibilityContainerNotifications}/>
+                    <SectionIconNotification onClick={showContainer}>
                         <IconNotification />
                         <Circle>                    
                             <LabelUnread >{quantityUnread}</LabelUnread>

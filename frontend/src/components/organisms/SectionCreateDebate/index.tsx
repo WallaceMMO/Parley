@@ -22,20 +22,20 @@ import { User } from '../../../store/ducks/user/types'
 
 const SectionCreateDebate = () => {    
     const [side, setSide] = useState(0)
-    const [topic, setTopic] = useState('Salário mínimo')
+    const [topic, setTopic] = useState('')
     const [rounds, setRounds] = useState<number>(3)
-    const [time, setTime] = useState('25')
-    const [argument, setArgument] = useState('dsdnsiijds')
+    const [argument, setArgument] = useState('')
     
     const [selectedGroup, setSelectedGroup] = useState(0)
     const [selectedUsers, setSelectedUsers] = useState(0)
 
     const dispatch = useDispatch()    
 
-    const user = useSelector((state) => state.userReducer.user)
-    const groups = useSelector((state) => state.groupReducer.groups) || null
+    const user = useSelector((state) => state.userReducer.user)    
 
     const [users, setUsers] = useState<User[] | null>(null)        
+
+    const groups = user?.patentMembersUser.map(patent => patent.groupPatentMember?.nameGroup)
 
     useEffect(() => {
         if(user) {
@@ -43,9 +43,7 @@ const SectionCreateDebate = () => {
                 const response = await api.get('/user/read')
                     
                 setUsers(response.data.users.filter((u: User) => u.idUser != user.idUser))
-              })()  
-
-              dispatch(GroupActions.FindByUserRequest(user.idUser))
+              })()                
         }
     }, [user])
     
@@ -53,19 +51,19 @@ const SectionCreateDebate = () => {
     function handleCreateDebate() {
         if(!users) return
                         
+        if(user)
         dispatch(DebateActions.createRequest({
             titleDebate: topic,
-            firstArgument: argument,
-            time,
+            firstArgument: argument,            
             rounds,            
             side,
             conDebate: {
                 userSideDebate: side == 0 ? users[selectedUsers].idUser : user.idUser,
-                groupSideDebate: side == 0 ? 0 : groups[selectedGroup].idGroup
+                groupSideDebate: side == 0 ? 0 : (selectedGroup != 0 ? user.patentMembersUser[selectedGroup-1].groupPatentMember?.idGroup ?? 0 : 0)
             },
             proDebate: {
                 userSideDebate: side == 1 ? users[selectedUsers].idUser : user.idUser,
-                groupSideDebate: side == 1 ? 0 : groups[selectedGroup].idGroup
+                groupSideDebate: side == 1 ? 0 : (selectedGroup != 0 ? user.patentMembersUser[selectedGroup-1].groupPatentMember?.idGroup ?? 0 : 0)
             }
         }))
         
@@ -73,26 +71,27 @@ const SectionCreateDebate = () => {
 
     return (
         <Container>
-            <Title>Start a new debate</Title>
-            <Subtitle>Want to debate an issue? Complete this form and we'll notify you when your opponent accepts your challenge.</Subtitle>
+            <Title>Começar um novo debate</Title>
+            <Subtitle>Quer começar um novo debate? Complete o formulário abaixo.</Subtitle>
 
             <SelectControl
                 setUpdateIndex={setSelectedUsers}
                 data={users?.map(user => user.nameUser)}
-                labelText='Opponent'
+                labelText='Oponente'
             />
 
             <SelectControl
-                setUpdateIndex={setSelectedGroup}
-                data={groups?.map(group => group.nameGroup)}
+                setUpdateIndex={setSelectedGroup}                
+                data={typeof groups?.at(0) == 'string' ? ['Sem grupo', ...groups] : ['Sem grupo']}
                 labelText='Representando'
             />
 
             <InputControl>
-                <Label>Topic</Label>
+                <Label>Tópico</Label>
                 <InputText 
                     onChange={(e) => setTopic(e.target.value)}
                     value={topic}
+                    placeholder="Tópico o debate"
                 />
             </InputControl>
 
@@ -103,31 +102,26 @@ const SectionCreateDebate = () => {
             />            
 
             <SelectControl 
-                labelText='Side'
+                labelText='Lado'
                 setUpdateIndex={setSide}
-                data={['Pro/For', 'Con/Against']}
-            />          
+                data={['Pró', 'Contra']}
+            />                     
 
             <InputControl>
-                <Label>Time to argue</Label>
-                <InputText 
-                    onChange={(e) => setTime(e.target.value)}
-                    value={time}
-                />
-            </InputControl>
-
-            <InputControl>
-                <Label>Argument</Label>
+                <Label>Argumento Inicial:</Label>
                 <InputTextArea 
                     onChange={(e) => setArgument(e.target.value)}
                     value={argument}
+                    placeholder="Argumento Inicial"
                 />
             </InputControl>
 
-            <Button
-                onClick={handleCreateDebate}
-                content='Start debate'
-            />
+            <InputControl>
+                <Button
+                    onClick={handleCreateDebate}
+                    content='Começar debate'
+                />
+            </InputControl>
         </Container>
     )
 }

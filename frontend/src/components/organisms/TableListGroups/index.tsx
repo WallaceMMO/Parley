@@ -15,7 +15,6 @@ interface PropsTableList {
     groups: Group[]
 }
 const TableListGroups = ({groups}: PropsTableList) => {
-
     
     return (
         <Container>

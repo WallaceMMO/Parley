@@ -1,21 +1,27 @@
 import {NextPage} from 'next'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import ListGroups from '../../../components/organisms/ListGroups'
 import TableListGroups from '../../../components/organisms/TableListGroups'
 import Header from '../../../components/templates/Header'
+import api from '../../../services/api'
 
 import * as ActionsGroup from '../../../store/ducks/group/actions'
+import { Group } from '../../../store/ducks/group/types'
 
 const List: NextPage = () => {   
     const dispatch = useDispatch()
+    const [groups, setGroups] = useState<Group[]>([])
 
-    const groups = useSelector(state => state.groupReducer.groups) || null
-
+    
     useEffect(() => {
-        dispatch(ActionsGroup.loadRequest())
+        (async function() {
+            const response = await api.get("group/read")
+
+            setGroups(response.data.groups)
+        })()
     }, [])
     
     return (

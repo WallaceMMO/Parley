@@ -1,10 +1,14 @@
 import {action} from 'typesafe-actions'
 import {DebateTypes, Debate, Message} from './types'
 
-export const readRequest = () => action(DebateTypes.READ_REQUEST)
+export const readRequest = (skip: number) => action(DebateTypes.READ_REQUEST, {skip})
 
 export const readSuccess = (debates: Debate[]) => {
     return action(DebateTypes.READ_SUCCESS, { debates })
+}
+
+export const concatDebates = (debates: Debate[]) => {
+    return action(DebateTypes.CONCAT_DEBATES, { debates })
 }
 
 export const FindByGroupRequest = (idGroup: number) => {
@@ -26,13 +30,12 @@ interface PropsCreateDebate {
     titleDebate: string
     firstArgument: string
     rounds: number
-    time: string    
     conDebate: PropsSideDebate
     proDebate: PropsSideDebate
     side: number
 }
-export const createRequest = ({firstArgument, titleDebate, time, rounds, conDebate, proDebate, side}: PropsCreateDebate) => 
-    action(DebateTypes.CREATE_REQUEST, {firstArgument, titleDebate, time, rounds, conDebate, proDebate, side})
+export const createRequest = ({firstArgument, titleDebate, rounds, conDebate, proDebate, side}: PropsCreateDebate) => 
+    action(DebateTypes.CREATE_REQUEST, {firstArgument, titleDebate, rounds, conDebate, proDebate, side})
 
 interface PropsAddMessage {
     message: string

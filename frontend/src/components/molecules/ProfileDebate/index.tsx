@@ -1,5 +1,6 @@
 import { SideDebate, SideEnum } from '../../../store/ducks/debate/types'
 import { User } from '../../../store/ducks/user/types'
+import IconPhotoProfile from '../../atoms/IconPhotoProfile'
 import {
     Container,
     SectionProfile,
@@ -16,15 +17,14 @@ interface Props {
 }
 
 const Left = ({sideDebate}: Props) => {
-    console.log(sideDebate)
+    
     return (
         <Container>
             <SectionProfile>
-                <PhotoProfile></PhotoProfile>
-                <Column>
-                    <LabelDescription>Honra: 50</LabelDescription>
-                    <LabelDescription>Glória: 1000</LabelDescription>
-                </Column>
+                <IconPhotoProfile
+                    src={sideDebate.userSideDebate.photoProfileUser}
+                    size={40}
+                 />                
             </SectionProfile>
 
                 <LabelName>{sideDebate.userSideDebate.nameUser}</LabelName>
@@ -38,12 +38,8 @@ const Right = ({sideDebate}: Props) => {
     
     return (
         <Container>
-            <SectionProfile>
-                <PhotoProfile></PhotoProfile>
-                <Column>                
-                    <LabelDescription>Honra: 50</LabelDescription>
-                    <LabelDescription>Glória: 1000</LabelDescription>
-                </Column>
+            <SectionProfile>                
+                <IconPhotoProfile size={40} src={sideDebate?.userSideDebate.photoProfileUser}/>
             </SectionProfile>
 
                 <LabelName>{sideDebate ? sideDebate.userSideDebate.nameUser : 'À espera'}</LabelName>

@@ -2,19 +2,18 @@ import styled from 'styled-components';
 import {IoMdNotifications} from 'react-icons/io'
 
 export const Header = styled.div`
-    height: 70px;
+    height: 80px;
     width: 100%;
     background-color: gray;
     
     display: flex;
     flex-direction: column;
     padding-top: 10px;
-    align-items: center;
+    align-items: center;    
 
-    background-color: ${({theme}) => theme.white}
+    background-color: ${({theme}) => theme.white};
+
 `;
-
-
 
 export const IconNotification = styled(IoMdNotifications)`
     width: 40px;
@@ -56,3 +55,4 @@ export const SectionProfile = styled.div`
     display: flex;
     flex-direction: row;    
 `
+

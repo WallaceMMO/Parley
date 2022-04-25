@@ -7,7 +7,7 @@ import { User } from '@models/User';
 import {NextFunction, Request, Response} from 'express'
 import { getRepository } from 'typeorm';
 
-import {Notification, NotificationStatus} from '../entities/Notification'
+import {Notification, NotificationStatus, NotificationType} from '../entities/Notification'
 
 class NotificationController {
     async all(request: Request, response: Response, next: NextFunction) {
@@ -59,6 +59,7 @@ class NotificationController {
             const otherSideDebate = await sideDebateRepository.createQueryBuilder("sidedebate")
                 .leftJoinAndSelect("sidedebate.userSideDebate", "user")
                 .leftJoinAndSelect("sidedebate.debateSideDebate", "debate")
+                .leftJoinAndSelect('debate.sidesDebate', 'sidesDebate')
                 .leftJoinAndSelect("sidedebate.groupSideDebate", "group")
                 .where("debate.idDebate = :id", {id: notification.debateNotification.idDebate})
                 .getOne()
@@ -68,13 +69,13 @@ class NotificationController {
                     idGroup: groupSideDebate
                 }
             })
-
-            if(!groupExists) {
-                return response.send({error: "groupExists undefined"})
+            
+            if(otherSideDebate.debateSideDebate.sidesDebate.length >= 2) {
+                return response.send({ error: '2 '})
             }
             const newSideDebate = new SideDebate()
             newSideDebate.debateSideDebate = otherSideDebate.debateSideDebate
-            newSideDebate.groupSideDebate = groupExists
+            newSideDebate.groupSideDebate = groupExists ?? null
             newSideDebate.side = otherSideDebate.side == SideEnum.CONDEBATE ? SideEnum.PRODEBATE : SideEnum.CONDEBATE
             newSideDebate.userSideDebate = notification.forUserNotification
            
@@ -99,11 +100,28 @@ class NotificationController {
             const notification = await notificationRepository.createQueryBuilder("notification")
                 .leftJoinAndSelect("notification.groupNotification", "group")                
                 .leftJoinAndSelect("notification.forUserNotification", "forUser")
-                .where("notification.idNotification = :id", {id: request.params.id})
+                .where("group.idGroup = :idgroup and forUser.idUser = :iduser", {
+                    idgroup: request.query.idgroup,
+                    iduser: request.query.iduser
+                })
                 .getOne()
-
+                
             notification.statusNotification = NotificationStatus.ACCPEPTED
+            
+            const patentMemberExists = await patentMemberRepository.createQueryBuilder("patentMember")
+                .leftJoinAndSelect("patentMember.groupPatentMember", "group")
+                .leftJoinAndSelect("patentMember.userPatentMember", "user")
+                .where("group.idGroup = :idgroup and user.idUser = :iduser", {
+                    idgroup: notification.groupNotification.idGroup,
+                    iduser: request.query.iduser
+                })
+                .getOne()                
 
+            if(patentMemberExists) {
+                notificationRepository.delete({idNotification: notification.idNotification})
+                return response.send({error: "this user already belong in group"})
+            }
+           
            const patentMember = patentMemberRepository.create({
                 groupPatentMember: notification.groupNotification,
                 honorPatentMember: 0,
@@ -114,17 +132,17 @@ class NotificationController {
             await patentMemberRepository.insert(patentMember)                                               
             await notificationRepository.save(notification)
 
-            const notificatonsGroupDelete = await notificationGroupRepository.createQueryBuilder("notificationGroup")
-                .leftJoinAndSelect("notificationGroup.groupNotificationGroup", "group")
-                .leftJoinAndSelect("notificationGroup.userNotificationGroup", "user")
+            const notificatonsDelete = await notificationRepository.createQueryBuilder("notification")
+                .leftJoinAndSelect("notification.groupNotification", "group")
+                .leftJoinAndSelect("notification.forUserNotification", "user")
                 .where("user.idUser = :idUser and group.idGroup = :idGroup", {
                     idUser: notification.forUserNotification.idUser,
                     idGroup: notification.groupNotification.idGroup
                 })
                 .getMany()
 
-            notificatonsGroupDelete.map(notificationGroup => {
-                notificationGroupRepository.delete({idNotificationGroup: notificationGroup.idNotificationGroup})
+            notificatonsDelete.map(notification => {
+                notificationRepository.delete({idNotification: notification.idNotification})
             })
             return response.send({ patentMember, notification });            
         } catch (error) {
@@ -142,7 +160,6 @@ class NotificationController {
                 .andWhere("notification.statusNotification = :waiting", {waiting: NotificationStatus.WAITING})
                 .getCount()
 
-                console.log(quantityUnread)
             return response.send({quantityUnread})
         } catch (error) {
             console.error(error)
@@ -157,9 +174,10 @@ class NotificationController {
         
         try {
             
-            const { debateNotification, forUserNotification, fromUserNotification, groupNotification } =
+            const { debateNotification, forUserNotification, fromUserNotification, groupNotification, typeNotification } =
               request.body.notification as Notification;                                                
-            
+              
+              
             if(!forUserNotification) { 
                 return response.send({error: "forUserNotification undefined"}) 
             } 
@@ -212,8 +230,6 @@ class NotificationController {
                 }
             })
 
-            console.log(fromUserExists.patentMembersUser.map(patent => console.log(patent)))
-
             if((debateExists && groupExists) || (!debateExists && !groupExists))
                 return response.send({error: "choose between debate or group"})             
 
@@ -228,7 +244,8 @@ class NotificationController {
                 groupNotification: groupExists || null,
                 debateNotification: debateExists || null,
                 fromUserNotification: fromUserExists,
-                forUserNotification: forUserExists,                
+                forUserNotification: forUserExists,  
+                typeNotification:  typeNotification == 'Groupsolicit' ? NotificationType.GROUPSOLICIT :NotificationType.DEBATESOLICITATION_FORUSER
             });
     
             await notificationRepository.save(notification);
@@ -239,22 +256,74 @@ class NotificationController {
         }
     }
 
+    async FindByUserSolicitation(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        
+        try {
+            const users = await userRepository.createQueryBuilder("user")
+                .leftJoinAndSelect("user.patentMembersUser", "patentMember")
+                .leftJoinAndSelect("patentMember.groupPatentMember", "group")
+                .leftJoinAndSelect("user.forNotificationsUser", "notification")
+                .where("notification.statusNotification = :status and notification.typeNotification = :type", {
+                    status: request.query.statusnotification,
+                    type: request.query.typenotification
+                })
+                .getMany()
+
+            return response.send({ users });            
+        } catch (error) {
+            console.error(error)
+        }
+    }   
+
+    async FindByUserWithoutGroup(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        try {
+            const idgroup = parseInt(request.params.idgroup)
+            
+            const users = await userRepository.createQueryBuilder("user")
+                .leftJoinAndSelect("user.patentMembersUser", "patentMember")
+                .leftJoinAndSelect("patentMember.groupPatentMember", "group")
+                .leftJoinAndSelect("user.forNotificationsUser", "notification")
+                .leftJoinAndSelect("notification.groupNotification", "inviteGroup")                                
+                .getMany()
+                                
+            const usersWithoutGroup: User[] = []
+            users.map(user => {
+                if(!user.forNotificationsUser.find(notification => notification.groupNotification?.idGroup == idgroup && notification.statusNotification == NotificationStatus.REJECTED)
+                    && !user.patentMembersUser.find(patent => patent.groupPatentMember.idGroup == idgroup) ) {
+
+                    const referenceNotification = user.forNotificationsUser.find(not => {
+                        return not.groupNotification.idGroup == idgroup && not.statusNotification != NotificationStatus.REJECTED
+                    })
+
+                    //@ts-ignore
+                    usersWithoutGroup.push({
+                        forNotificationsUser: referenceNotification ? [referenceNotification] : [],
+                        ...user
+                    })
+                }
+            })
+            return response.send({ users: usersWithoutGroup });            
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     async FindByUser(request: Request, response: Response, next: NextFunction) {
         const notificationRepository = getRepository(Notification);
         const userRepository = getRepository(User);        
         
         try {
-            const userExists = await userRepository.findOne({
-                where: {
-                    idUser: request.params.iduser
-                }
-            })
+           
             const notifications = await notificationRepository.createQueryBuilder('notification')
                 .leftJoinAndSelect("notification.fromUserNotification", "fromUser")
                 .leftJoinAndSelect("notification.forUserNotification", "forUser")
-                .leftJoinAndSelect("notification.groupNotification", "group")
                 .leftJoinAndSelect("notification.debateNotification", "debate")
-                .where("forUser.idUser = :id", {id: userExists.idUser})
+                .leftJoinAndSelect("debate.sidesDebate", "sides")
+                .leftJoinAndSelect("sides.userSideDebate", "userSide")
+                .leftJoinAndSelect("sides.groupSideDebate", "groupSide")
+                .where("forUser.idUser = :id", {id: request.params.iduser})
                 .getMany()
             
             return response.send({ notifications })

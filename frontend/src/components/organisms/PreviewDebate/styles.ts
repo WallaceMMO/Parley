@@ -6,10 +6,13 @@ export const Container = styled.div`
   align-items: center;
   flex-direction: column;
     
-  background-color: ${themes.light.white};  
+  background-color: #fff;  
   height: 251px;
   margin-top: 3%;
   padding: 10px;
+  border-radius: 15px;
+
+  cursor: pointer;
 `
 
 export const Title = styled.span`

@@ -9,16 +9,16 @@ import  {
 interface Props {
     labelText: string
     setUpdateIndex: Dispatch<SetStateAction<number>>
-    data?: string[]
+    data?: any
 }
 
-const SelectControl = ({data, labelText, setUpdateIndex}: Props) => {
+const SelectControl = ({data, labelText, setUpdateIndex}: Props) => {    
     return (
         <InputControl>
             <Label>{labelText}</Label>
             <select onChange={(e) => setUpdateIndex(e.target.selectedIndex)}>
                 {
-                    data?.map(item => {
+                    data?.map((item: string) => {
                         return (
                             <option>{item}</option>
                         )

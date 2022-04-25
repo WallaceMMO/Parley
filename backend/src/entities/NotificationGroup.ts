@@ -19,8 +19,9 @@ export enum NotificationStatus {
 }
 
 export enum NotificationType {
-    GROUPSOLICITATION = 'GroupSolicitation',
-    USERSOLICITATION = 'UserSolicitation'
+    INVITEFORUSER = 'InviteForUser',
+    INVITEFORGROUP = 'InviteForGroup',
+    SOLICITATIONFORGROUP = 'SolicitationForGroup',
 }
 
 @Entity()
@@ -41,16 +42,21 @@ export class NotificationGroup extends BaseEntity {
         type: 'enum',
         enum: NotificationType,
         enumName: 'NotificationType',
-        default: NotificationType.USERSOLICITATION
+        default: NotificationType.INVITEFORUSER        
     })
     typeNotificationGroup: NotificationType
     
-    @ManyToOne(type => User, user => user.notificationsGroupUser)
-    userNotificationGroup: User
+    @ManyToOne(type => User, user => user.forNotificationsGroupUser, {nullable: true})
+    forUserNotificationGroup: User
 
-    @ManyToOne(type => Group, group => group.forGlobalNotificationsGroup)
+    @ManyToOne(type => User, user => user.fromNotificationsGroupUser, {nullable: true})
+    fromUserNotificationGroup: User
+
+    @ManyToOne(type => Group, group => group.forGlobalNotificationsGroup, {nullable: true})
     forGroupNotificationGroup: Group
 
-    @ManyToOne(type => Group, group => group.fromGlobalNotificationsGroup)
+    @ManyToOne(type => Group, group => group.fromGlobalNotificationsGroup, {
+        nullable: true
+    })
     fromGroupNotificationGroup: Group
 }

@@ -30,7 +30,9 @@ const NotificationsRecruit = () => {
 
     useEffect(() => {        
         if (group)
-            dispatch(NotificationsGroupActions.FindByGroupNotificationsGroupRequest(group.idGroup))
+            dispatch(NotificationsGroupActions.FindByGroupNotificationsGroupRequest({
+                groupId: group.idGroup
+            }))
     }, [group])
 
     return (

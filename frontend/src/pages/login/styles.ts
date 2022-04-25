@@ -16,8 +16,7 @@ export const Container = styled.div`
 export const MainContainer = styled.div`
   display: flex;
   align-items: center;
-  flex-direction: column;
-  height: 90vh;
+  flex-direction: column;  
   width: 30vw;
   background: rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
@@ -25,11 +24,10 @@ export const MainContainer = styled.div`
   -webkit-backdrop-filter: blur(8.5px);
   border-radius: 10px;
   color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 0.4rem;
+  letter-spacing: 0.2rem;
   @media only screen and (max-width: 320px) {
     width: 80vw;
-    height: 90vh;
+    height: 75vh;
     hr {
       margin-bottom: 0.3rem;
     }
@@ -39,26 +37,26 @@ export const MainContainer = styled.div`
   }
   @media only screen and (min-width: 360px) {
     width: 80vw;
-    height: 90vh;
+    height: 75vh;
     h4 {
       font-size: small;
     }
   }
   @media only screen and (min-width: 411px) {
     width: 80vw;
-    height: 90vh;
+    height: 75vh;
   }
   @media only screen and (min-width: 768px) {
     width: 80vw;
-    height: 80vh;
+    height: 65vh;
   }
   @media only screen and (min-width: 1024px) {
     width: 70vw;
-    height: 50vh;
+    height: 35vh;
   }
   @media only screen and (min-width: 1280px) {
     width: 30vw;
-    height: 80vh;
+    height: 65vh;
   }
 `;
 
@@ -68,39 +66,26 @@ export const WelcomeText = styled.h2`
 `;
 
 export const InputContainer = styled.div`
-
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  height: 20%;
+  height: 30%;
   width: 100%;
 `;
 
-export const ButtonContainer = styled.div`
-
-  margin: 1rem 0 2rem 0;
+export const ButtonContainer = styled.div`  
+  margin: 2rem 0 2rem 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
-export const LoginWith = styled.h5`
+export const RedirectOther = styled.h5`
   cursor: pointer;
-  
-`;
+  color: black;
 
-export const HorizontalRule = styled.hr`
-
-  /* width: 90%;
-  height: 0.3rem;
-  border-radius: 0.8rem;
-  border: none;
-  background: linear-gradient(to right, #14163c 0%, #03217b 79%);
-  background-color: #ebd0d0;
-  margin: 1.5rem 0 1rem 0;
-  backdrop-filter: blur(25px); */
 `;
 
 export const IconsContainer = styled.div`
@@ -114,3 +99,16 @@ export const IconsContainer = styled.div`
 export const ForgotPassword = styled.h4`
   cursor: pointer;
 `;
+
+export const ErrorMessage = styled.span`
+  color: #ee2332;
+  font-size: 15px;
+`
+
+export const MessageBox = styled.div`
+    margin-top: 15px;
+    margin-left: 5px;
+    height: 5%;
+    width: 80%;
+    align-items: left;
+`

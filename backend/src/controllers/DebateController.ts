@@ -14,6 +14,9 @@ class DebateController {
     async all(request: Request, response: Response, next: NextFunction) {
         const debateRepository = getRepository(Debate);
 
+        const page = parseInt(request.query.page as any) || 1;
+        const take = 5;
+
         try {
             const debates = await debateRepository.createQueryBuilder("debate")                
                 .leftJoinAndSelect("debate.messagesDebate", "message")                
@@ -23,7 +26,9 @@ class DebateController {
                 .leftJoinAndSelect("message.sideDebateMessage", "sidedebatemessage")
                 .leftJoinAndSelect("sidedebatemessage.userSideDebate", "usersidedebate")
                 .loadRelationCountAndMap("debate.quantityViews", 'debate.viewsDebate')
-                .getMany()                
+                .skip((page - 1) * take)                
+                .take(take)
+                .getMany()
 
             return response.send({ debates });            
         } catch (error) {
@@ -126,7 +131,7 @@ class DebateController {
                 .leftJoinAndSelect("sidedebate.userSideDebate", "user")
                 .leftJoinAndSelect("sidedebate.groupSideDebate", "group")
                 .leftJoinAndSelect("message.sideDebateMessage", "sidedebatemessage")
-                .leftJoinAndSelect("sidedebatemessage.userSideDebate", "usersidedebate")                
+                .leftJoinAndSelect("sidedebatemessage.userSideDebate", "usersidedebate")
                 .where("user.idUser = :id", {id: request.params.iduser})
                 .loadRelationCountAndMap("debate.quantityViews", 'debate.viewsDebate')
                 .getMany()                            
@@ -173,13 +178,6 @@ class DebateController {
             const groupCon = await groupRepository.findOne({idGroup: conDebate.groupSideDebate})
             const groupPro = await groupRepository.findOne({idGroup: proDebate.groupSideDebate})
 
-            console.log("side")
-            console.log(conDebate)
-            console.log(proDebate)
-
-            console.log("group")
-            console.log(groupCon)
-            console.log(groupPro)
             const userConExists = await userRepository.findOne({where: {idUser: conDebate.userSideDebate}})
             const userProExists = await userRepository.findOne({where: {idUser: proDebate.userSideDebate}})
 
@@ -195,7 +193,6 @@ class DebateController {
             debate.tagsDebate = tagsDebate            
             debate.titleDebate = titleDebate            
 
-            debate.timeToArgueDebate = parseInt(timeToArgueDebate)
             debate.roundsDebate = roundsDebate
             debate.honorDebate = honorDebate
             debate.statusDebate = StatusDebate.OPEN
@@ -214,8 +211,6 @@ class DebateController {
             proUserDebate.userSideDebate = userProExists
             proUserDebate.debateSideDebate = debate
 
-            
-            
             const conUserDebate = new SideDebate()
 
             conUserDebate.side = SideEnum.CONDEBATE

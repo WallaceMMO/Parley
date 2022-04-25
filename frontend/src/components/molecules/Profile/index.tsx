@@ -15,9 +15,15 @@ const Profile = () => {
     return (
         <Container>
             <Link href={`user/${user?.idUser}`}>
-                <div>
+                <div style={{
+                    display: 'flex',  
+                    flexDirection:'column',
+                    alignItems: 'center',
+                    cursor: 'pointer'
+                }}>
                     <IconPhotoProfile 
-                        size={40}                    
+                        size={40}
+                        src={user?.photoProfileUser}
                     />
                     <LabelName>{user?.nameUser}</LabelName>
                 </div>

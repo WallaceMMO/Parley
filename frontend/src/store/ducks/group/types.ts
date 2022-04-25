@@ -1,20 +1,31 @@
 import { Socket } from "socket.io-client";
-import { Debate } from "../debate/types";
+import { Debate, SideDebate } from "../debate/types";
+import { NotificationGroup } from "../notificationGroup/types";
 import { User } from "../user/types";
 
 
 export enum GroupTypes {
-    LOAD_GROUPS = '@group/LOAD_GROUPS',
-    LOAD_ONE_REQUEST = '@group/LOAD_ONE_REQUEST',
     
-    SUCCESS_LOAD_GROUPS = '@group/SUCESS_LOAD_GROUPS',
-    SUCCESS_LOAD_GROUP = '@group/SUCCESS_LOAD_GROUP',
+    REQUEST_LOAD_GROUPS = '@group/REQUEST_LOAD_GROUPS',
+    REQUEST_LOAD_GROUPSELECTED = '@group/REQUEST_LOAD_GROUPSELECTED',
+    REQUEST_LOAD_GROUPSRECRUIT = '@group/REQUEST_LOAD_GROUPSRECRUIT',
+    REQUEST_LOAD_USERSRECRUIT = '@group/REQUEST_LOAD_USERSRECRUIT',
+    REQUEST_LOAD_USERSSOLICITATION = '@group/REQUEST_LOAD_USERSSOLICITATION',
+    REQUEST_LOAD_GROUPSINVITES = '@group/REQUEST_LOAD_GROUPSINVITES',
+    
+    SUCCESS_LOAD_GROUPS = '@group/SUCCESS_LOAD_GROUPS',
+    SUCCESS_LOAD_GROUPSELECTED = '@group/SUCCESS_LOAD_GROUPSELECTED',
+    SUCCESS_LOAD_GROUPSRECRUIT = '@group/SUCCESS_LOAD_GROUPSRECRUIT',
+    SUCCESS_LOAD_USERSRECRUIT = '@group/SUCCESS_LOAD_USERSRECRUIT',
+    SUCCESS_LOAD_USERSSOLICITATION = '@group/SUCCESS_LOAD_USERSSOLICITATION',
+    SUCCESS_LOAD_GROUPSINVITES = '@group/SUCCESS_LOAD_GROUPSINVITES',
 
     FAILURE_GROUPS = '@group/FAILURE_GROUPS',
     
     FINDBYUSER_REQUEST = '@group/FINDBYUSER_REQUEST',
 
     SOLICIT_REQUEST = '@group/SOLICIT_REQUEST',
+    CHANGEDSITUATIONUSERORGROUP = '@group/CHANGEDSITUATIONUSERORGROUP',        
 
     CREATEGROUP_REQUEST = '@group/CREATEGROUP_REQUEST',
     REDIRECT_GROUP = '@group/REDIRECT_GROUP',
@@ -29,7 +40,8 @@ export interface PatentMember {
     namePatentMember: string;
     honorPatentMember: number;
     userPatentMember: User;
-
+    memberGroupPatentMember: Group
+    
     groupPatentMember?: Group
 }
 
@@ -52,26 +64,44 @@ export interface ItemChat {
 }
 
 export interface Group {
-    idGroup: number;
-    nameGroup: string;
-    descriptionGroup: string;
+    idGroup: number
+
+    nameGroup: string;           
+    
+    descriptionGroup: string            
+
     patentMembersGroup: PatentMember[]
 
-    proDebatesGroup: ProDebate[]    
-    conDebatesGroup: ConDebate[]
+    proDebatesGroup: SideDebate[]
+    
+    conDebatesGroup: SideDebate[]
 
     groupsBelongings: Group[]
+
     groupsMember: Group[]
 
-    itemChatsGroup: ItemChat[]   
+    itemChatsGroup: ItemChat[]
+
+    notificationsGroup: Notification[]
+
+    forGlobalNotificationsGroup: NotificationGroup[]
+
+    fromGlobalNotificationsGroup: NotificationGroup[]
 
     participantsGroup?: number
     debatesMade?: number    
 }
 
 export interface GroupState {
-    readonly group: Group | null
+    readonly groupSelected: Group | null
     readonly groups: Group[]
+
+    readonly usersRecruit: User[]
+    readonly groupsRecruit: Group[]            
+
+    readonly usersSolicitation: User[]
+    readonly groupsInvites: Group[]            
+    
     readonly loading: boolean
     readonly error: boolean
 }

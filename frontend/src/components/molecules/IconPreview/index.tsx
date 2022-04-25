@@ -20,13 +20,12 @@ interface Props {
 }
 
 const IconPreview: NextPage<Props> = ({user, left}) => {
-
+    
     return (
-
         left ? (
             <Container>
                 <PhotoProfile 
-                src="https://www.ecp.org.br/wp-content/uploads/2017/12/default-avatar-1.png"
+                src={new Buffer(user?.photoProfileUser ?? '').toString("ascii") == '' ? 'https://www.ecp.org.br/wp-content/uploads/2017/12/default-avatar-1.png' : new Buffer(user?.photoProfileUser ?? '').toString("ascii")}
                 left={true}/>
                 <SectionDescription>
                     <LabelName>{user?.nameUser ?? 'Á espera'}</LabelName>                    
@@ -39,7 +38,7 @@ const IconPreview: NextPage<Props> = ({user, left}) => {
                 </SectionDescription>
                 <PhotoProfile 
                 left={false} 
-                src="https://www.ecp.org.br/wp-content/uploads/2017/12/default-avatar-1.png"/>
+                src={new Buffer(user?.photoProfileUser ?? '').toString("ascii") == '' ? 'https://www.ecp.org.br/wp-content/uploads/2017/12/default-avatar-1.png' : new Buffer(user?.photoProfileUser ?? '').toString("ascii")}/>
             </Container>
         )
     )

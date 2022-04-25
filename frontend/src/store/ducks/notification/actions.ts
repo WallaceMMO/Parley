@@ -1,5 +1,5 @@
 import {action} from 'typesafe-actions'
-import {Notification, NotificationTypes, NotificationType} from './types'
+import {Notification, NotificationTypes, NotificationType, NotificationStatus} from './types'
 
 export const loadNotificationsRequest = (userId: number) => {
     return action(NotificationTypes.LOAD_NOTIFICATIONS, userId)
@@ -7,6 +7,13 @@ export const loadNotificationsRequest = (userId: number) => {
 
 export const getUnreadRequest = (userId: number) => {
     return action(NotificationTypes.GETUNREAD_REQUEST, {userId})
+}
+
+export const ChangedStatusNotification = ({idNotificationGroup, statusNotificationGroup}: {
+    idNotificationGroup: number,
+    statusNotificationGroup: NotificationStatus
+}) => {
+    return action(NotificationTypes.CHANGEDSTATUSNOTIFICATION, {idNotificationGroup, statusNotificationGroup})
 }
 
 export const successNotificationsrequest = (notifications: Notification[]) => {
@@ -18,12 +25,21 @@ export const successGetUnread = (quantityUnread: number) => {
 }
 
 interface PropsCreate {
-    idUser: number
+    forIdUser: number
+    fromIdUser: number
     idGroup: number
     typeNotification: NotificationType
 }
-export const createNotificationRequest = ({idGroup, idUser, typeNotification}:  PropsCreate) => {
-    return action(NotificationTypes.CREATE_REQUEST, {idGroup, idUser, typeNotification})
+export const createNotificationRequest = ({idGroup, forIdUser, fromIdUser, typeNotification}:  PropsCreate) => {
+    return action(NotificationTypes.CREATE_REQUEST, {idGroup, forIdUser, fromIdUser, typeNotification})
+}
+
+interface PropsFindByUserSolicitation {
+    typeNotification: NotificationType
+    statusNotification: NotificationStatus
+}
+export const FindByUserSolicitationsRequest = ({statusNotification, typeNotification}: PropsFindByUserSolicitation) => {
+    return action(NotificationTypes.FINDBYUSERSOLICITATION_REQUEST, {statusNotification, typeNotification})
 }
 
 interface PropsAcceptDebate {
@@ -33,4 +49,16 @@ interface PropsAcceptDebate {
 }
 export const acceptDebateRequest = ({idNotification, idGroup, idUser}: PropsAcceptDebate) => {
     return action(NotificationTypes.ACCEPTDEBATE_REQUEST, {idNotification, idGroup, idUser})
+}
+
+export const FindByUserWithoutGroupRequest = (idGroup: number) => {
+    return action(NotificationTypes.FINDBYUSERWITHOUTGROUP_REQUEST, {idGroup})
+}
+
+interface PropsAcceptGroup {
+    idGroup: number    
+    idUser: number
+}
+export const acceptGroupRequest = ({idGroup, idUser}: PropsAcceptGroup) => {
+    return action(NotificationTypes.ACCEPTGROUP_REQUEST, {idGroup, idUser})
 }

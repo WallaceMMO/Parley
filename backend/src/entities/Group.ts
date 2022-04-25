@@ -7,7 +7,8 @@ import {
     BeforeUpdate,
     OneToMany,
     ManyToOne,
-    ManyToMany
+    ManyToMany,
+    JoinTable
 } from 'typeorm'
 
 import {BaseEntity} from './BaseEntity'
@@ -41,17 +42,14 @@ export class Group extends BaseEntity {
     @OneToMany((type) => PatentMember, (patent) => patent.groupPatentMember)
     patentMembersGroup: PatentMember[]
 
+    @OneToMany((type) => PatentMember, (patent) => patent.memberGroupPatentMember)
+    belongingPatentMembersGroup: PatentMember[]
+
     @OneToMany(type => SideDebate, pro => pro.groupSideDebate)
     proDebatesGroup: SideDebate[]
     
     @OneToMany(type => SideDebate, pro => pro.groupSideDebate)
-    conDebatesGroup: SideDebate[]
-
-    @ManyToMany(type => Group, group => group.groupsMember)
-    groupsBelongings: Group[]
-
-    @ManyToMany(type => Group, group => group.groupsBelongings)
-    groupsMember: Group[]
+    conDebatesGroup: SideDebate[]    
 
     @OneToMany(type => ItemChat, item => item.groupItemChat)
     itemChatsGroup: ItemChat[]

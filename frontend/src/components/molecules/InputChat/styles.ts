@@ -3,14 +3,15 @@ import styled from 'styled-components';
 import {IoMdSend} from 'react-icons/io'
 
 export const Container = styled.div`
-  bottom: 20px;
-
+  margin-top: 20px;
+  bottom: 0px;  
+  width: 100%;
   align-self: center;
   align-items: center;
 `;
 
 export const Input = styled.input`
-    width: 736px;
+    width: 100%;
     border: 1px solid #000;
     height: 42px;
     font-size: 20px;

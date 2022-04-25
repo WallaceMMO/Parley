@@ -28,14 +28,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 interface Props {
-    id: string
+    id: number
 }
 
 const GroupPage: NextPage<Props> = ({id}) => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(GroupActions.loadOneRequest(id))
+        dispatch(GroupActions.loadGroupSelectedRequest(id))
     }, []) 
     
     return(

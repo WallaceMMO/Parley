@@ -27,8 +27,15 @@ export class PatentMember extends BaseEntity {
     @Column()
     honorPatentMember: number
 
-    @ManyToOne((type) => User, user => user.patentMembersUser)
+    @ManyToOne((type) => User, user => user.patentMembersUser, {
+        nullable: true
+    })
     userPatentMember: User
+
+    @ManyToOne((type) => Group, group => group.belongingPatentMembersGroup, {
+        nullable: true
+    })
+    memberGroupPatentMember: Group
 
     @ManyToOne((type) => Group, group => group.patentMembersGroup)
     groupPatentMember: Group

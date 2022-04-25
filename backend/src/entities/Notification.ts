@@ -19,7 +19,7 @@ export enum NotificationStatus {
 }
 
 export enum NotificationType {
-    USERSOLICIT = 'Usersolicit',
+    DEBATESOLICITATION_FORUSER = 'DebateSolicitationForUser',
     GROUPSOLICIT = 'Groupsolicit',    
 }
 
@@ -41,7 +41,7 @@ export class Notification extends BaseEntity {
         type: 'enum',
         enum: NotificationType,
         enumName: 'NotificationType',
-        default: NotificationType.USERSOLICIT
+        default: NotificationType.DEBATESOLICITATION_FORUSER
     })
     typeNotification: NotificationType
     

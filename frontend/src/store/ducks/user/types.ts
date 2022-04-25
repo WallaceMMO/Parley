@@ -1,5 +1,7 @@
-import { Debate } from "../debate/types";
+import { Debate, SideDebate } from "../debate/types";
 import { PatentMember } from "../group/types";
+import { Notification } from "../notification/types";
+import { NotificationGroup } from "../notificationGroup/types";
 
 export enum UserTypes {
     REGISTER_REQUEST = '@user/REGISTER_REQUEST',
@@ -18,21 +20,50 @@ export enum UserTypes {
     TOKEN_AUTHENTICATE_SUCCESS = '@user/TOKEN_AUTHENTICATE_SUCCESS',
     TOKEN_AUTHENTICATE_ERROR = '@user/TOKEN_AUTHENTICATE_ERROR',
 
-    CHANGE_THEME = '@config/CHANGE_THEME'
-
+    CHANGE_PHOTOPROFILE = '@user/CHANGE_PHOTOPROFILE',
+    CHANGE_THEME = '@config/CHANGE_THEME',
 }
 
 export interface User {
-    idUser: number
-    nameUser: string
-    descriptionUser: string
-    emailUser: string
-    photoProfileUser: Buffer
-    passwordUser: string
+    idUser: number 
 
-    themeActive: string
+    nameUser: string;
+
+    descriptionUser: string    
+
+    gloryUser: number
+
+    honorUser: number
+
+    activityUser: Date
+    
+    emailUser: string;
+
+    passwordUser: string;
+
+    followersUser: number
+    
+    photoProfileUser: string    
+    
 
     patentMembersUser: PatentMember[]
+
+    proDebatesUser: SideDebate[]
+
+    conDebatesUser: SideDebate[]
+
+    fromNotificationsUser: Notification[]
+
+    forNotificationsUser: Notification[]
+
+    fromNotificationsGroupUser: NotificationGroup[]
+
+    forNotificationsGroupUser: NotificationGroup[]
+
+    userStarred: User[]
+
+    userFavorites: User[]
+    
     mostViewedDebate?: Debate
     madeDebates?: number
     totalDebates?: Debate[]
@@ -44,5 +75,5 @@ export interface UserState {
     readonly userList: User[]
     readonly token: string
     readonly loading: boolean
-    readonly error: boolean
+    readonly error: string | null
 }

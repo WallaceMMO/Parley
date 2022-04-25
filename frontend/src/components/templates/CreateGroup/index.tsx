@@ -24,11 +24,12 @@ const CreateGroup = () => {
     const user = useSelector(state => state.userReducer.user)    
 
     function handleCreateGroup() {
-        dispatch(GroupActions.createRequest({
-            descriptionGroup,
-            nameGroup,
-            idUser: user.idUser
-        }))
+        if(user)
+            dispatch(GroupActions.createRequest({
+                descriptionGroup,
+                nameGroup,
+                idUser: user.idUser
+            }))
     }
     
     return (

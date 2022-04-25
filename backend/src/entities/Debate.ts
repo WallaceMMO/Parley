@@ -43,11 +43,7 @@ export class Debate extends BaseEntity {
     
     @Column()
     @IsInt()
-    honorDebate: number   
-    
-    @Column()
-    @IsInt()
-    timeToArgueDebate: number
+    honorDebate: number       
 
     @Column()
     @IsInt()

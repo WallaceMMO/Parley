@@ -16,6 +16,7 @@ import {
     SectionText
 } from './styles'
 import { useEffect } from 'react'
+import IconPhotoProfile from '../../atoms/IconPhotoProfile'
 
 interface PropsItem {
     message: Message
@@ -25,7 +26,7 @@ const ItemDebate = ({message}: PropsItem) => {
     return (
         <ContainerItem>
             <SectionProfile>
-                <PhotoProfile />
+                <IconPhotoProfile size={40} src={message.sideDebateMessage.userSideDebate.photoProfileUser} />
                 <LabelName>{message.sideDebateMessage.userSideDebate.nameUser}</LabelName>
                 <LabelSide>{message.sideDebateMessage.side == 'ProDebate' ? 'Pró' : 'Contra'}</LabelSide>
             </SectionProfile>
@@ -45,7 +46,7 @@ const BodyDebate = () => {
     const debate = useSelector(state => state.debateReducer.debateSelected) || null
     const user = useSelector(state => state.userReducer.user) || null
 
-    const sideDebate = debate?.sidesDebate[0].userSideDebate.idUser == user.idUser ? debate?.sidesDebate[0] : debate?.sidesDebate[1]
+    const sideDebate = debate?.sidesDebate[0].userSideDebate.idUser == user?.idUser ? debate?.sidesDebate[0] : debate?.sidesDebate[1]
     const messages = debate?.messagesDebate    
     
     function addMessage(message: string) {

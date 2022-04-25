@@ -16,8 +16,9 @@ class GroupController {
                 .leftJoinAndSelect("patentMember.userPatentMember", "user")
                 .leftJoinAndSelect("group.proDebatesGroup", "proDebate")
                 .leftJoinAndSelect("group.conDebatesGroup", "conDebate")
+                .leftJoinAndSelect("group.belongingPatentMembersGroup", "groupsBelongings")
                 .leftJoinAndSelect("proDebate.debateSideDebate", "proDebateSideDebate")
-                .leftJoinAndSelect("conDebate.debateSideDebate", "conDebateSideDebate")                
+                .leftJoinAndSelect("conDebate.debateSideDebate", "conDebateSideDebate")                                
                 .loadRelationCountAndMap("group.participantsGroup", "group.patentMembersGroup")                
                 .getMany()
 
@@ -57,6 +58,7 @@ class GroupController {
                 .where("group.idGroup = :id", {id: request.params.id})
                 .leftJoinAndSelect("group.itemChatsGroup", "itemchat")
                 .leftJoinAndSelect("group.patentMembersGroup", "patentmember")
+                .leftJoinAndSelect("patentmember.memberGroupPatentMember", "groupsMember")
                 .leftJoinAndSelect("patentmember.userPatentMember", "user")
                 .leftJoinAndSelect("itemchat.userItemChat", "userChat")
                 .getOne()
@@ -67,6 +69,33 @@ class GroupController {
         }
     }    
 
+    async GetGroupsPatent(request: Request, response: Response, next: NextFunction) {
+        const groupRepository = getRepository(Group);
+        
+        try {
+            const group = await groupRepository.createQueryBuilder("group") 
+                .leftJoinAndSelect("group.patentMembersGroup", "patentMember")                                
+                .leftJoinAndSelect("patentMember.userPatentMember", "user")                                
+                .leftJoinAndSelect("patentMember.memberGroupPatentMember", "groupPatent")                                
+                .leftJoinAndSelect("groupPatent.patentMembersGroup", "patentMemberGroup")                                
+                .leftJoinAndSelect("patentMemberGroup.userPatentMember", "userPatent")                                
+                .where("group.idGroup = :id", {id: request.params.id})
+                .getOne()                            
+            
+            const groupsPatent = []
+
+            group.patentMembersGroup.map((item, index) => {
+                if(group.patentMembersGroup[index].memberGroupPatentMember) {
+                    groupsPatent.push(item.memberGroupPatentMember)
+                    group.patentMembersGroup.splice(index, 1)
+                }
+            })            
+
+            return response.send({groups: [group, ...groupsPatent]})
+        } catch (error) {
+            console.error(error)        
+        }
+    }
     async FindByUser(request: Request, response: Response, next: NextFunction) {
         const groupRepository = getRepository(Group);
 

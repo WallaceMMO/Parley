@@ -3,19 +3,29 @@ import {AxiosResponse} from 'axios'
 import api from '../../../services/api'
 import {
     createRequest, 
-    failureLoadRequest, 
-    loadOneRequest, 
-    loadRequest, 
+    failureLoadRequest,          
     outputMessageRequest, 
     outputMessageSuccess, 
-    refreshMessagesRequest, 
-    successLoadRequest,
+    refreshMessagesRequest,     
     redirectGroup,
-    solicitRequest,
-    successLoadOneRequest,
-    FindByUserRequest
+    solicitRequest,    
+    FindByUserRequest,
+    ChangedSituationNotificationGroup,
+    loadGroupSelectedRequest,
+    loadGroupSelectedSuccess,
+    loadGroupsRecruitRequest,
+    loadGroupsRecruitSuccess,
+    loadGroupsRequest,
+    loadGroupsSuccess,
+    loadUsersRecruitRequest,
+    loadUsersRecruitSuccess,
+    loadUsersSolicitationRequest,
+    loadUsersSolicitationSuccess,
+    loadGroupsInviteRequest,
+    loadGroupsInviteSuccess
 } from './actions'
 import {Group} from './types'
+import { NotificationStatus } from '../notification/types'
 
 export function* loadGroups() {
     try {
@@ -25,20 +35,20 @@ export function* loadGroups() {
             throw response.data.error
         }
 
-        yield put(successLoadRequest(response.data.groups))
+        yield put(loadGroupsSuccess(response.data.groups))
     } catch (error) {
         console.error(error)
     }    
 }
 
-export function* loadOne({payload: {id}}: ReturnType<typeof loadOneRequest>) {
+export function* loadGroupSelected({payload: {idGroup}}: ReturnType<typeof loadGroupSelectedRequest>) {
     try {
-        const response: AxiosResponse = yield call(api.get, `/group/read/${id}`)
+        const response: AxiosResponse = yield call(api.get, `/group/read/${idGroup}`)
 
         if(response.data.error) {
             throw response.data.error
         }
-        yield put(successLoadOneRequest(response.data.group))
+        yield put(loadGroupSelectedSuccess(response.data.group))
     } catch (error) {
         
     }    
@@ -59,13 +69,12 @@ export function* createGroup({payload: {
                 idUser
             }
         })
-
-        console.log(response.data)
+        
         if(response.data.error) {
             throw response.data.error
         }
 
-        yield put(redirectGroup(response.data.idGroup))
+        yield put(redirectGroup(response.data.group.idGroup))
     } catch (error) {
         console.error(error)
     }    
@@ -140,8 +149,71 @@ export function* FindByUserGroups({payload: {idUser}}: ReturnType<typeof FindByU
             throw response.data.error
         }
 
-        yield put(successLoadRequest(response.data.groups))
+        yield put(loadGroupsRecruitSuccess(response.data.groups))
     } catch (error) {
         console.log(error)
     }    
 }
+
+export function* loadGroupsRecruit({payload: {idGroup}}: ReturnType<typeof loadGroupsRecruitRequest>) {    
+    
+    try {
+        const response: AxiosResponse = yield call(api.get, `/notificationgroup/findbygroupwithoutinvite/${idGroup}`)
+        
+        if(response.data.error) {
+            throw response.data.error
+        }
+
+        yield put(loadGroupsRecruitSuccess(response.data.groups))
+    } catch (error) {
+        console.log(error)
+    }    
+}
+
+export function* loadUsersRecruit({payload: {idGroup, typeNotificationGroup, statusNotificationGroup}}: ReturnType<typeof loadUsersRecruitRequest>) {    
+    
+    try {
+        const response: AxiosResponse = yield call(api.get, `/notificationgroup/findusers/${idGroup}/?type=${typeNotificationGroup}&status=${ statusNotificationGroup}`)
+        
+        if(response.data.error) {
+            throw response.data.error
+        }        
+
+        yield put(loadUsersRecruitSuccess(response.data.users))
+    } catch (error) {
+        console.log(error)
+    }    
+}
+
+export function* loadUsersSolicitation({payload: {idGroup, statusNotificationGroup}}: ReturnType<typeof loadUsersSolicitationRequest>) {    
+    
+    try {        
+        const response: AxiosResponse = yield call(api.get, `/notificationgroup/findbyusersolicitation/?idgroup=${1}&statusnotificationgroup=${NotificationStatus.WAITING}`)
+                
+        if(response.data.error) {
+            throw response.data.error
+        }
+        
+        console.log(response.data)
+
+        yield put(loadUsersSolicitationSuccess(response.data.users))
+    } catch (error) {
+        console.log(error)
+    }    
+}
+
+export function* loadGroupsInvite({payload: {idGroup, statusNotificationGroup}}: ReturnType<typeof loadGroupsInviteRequest>) {    
+    
+    try {
+        const response: AxiosResponse = yield call(api.get, `/notificationgroup/findbygroupinvite/${idGroup}/?statusnotificationgroup=${statusNotificationGroup}`)
+        
+        if(response.data.error) {
+            throw response.data.error
+        }
+
+        yield put(loadGroupsInviteSuccess(response.data.groups))
+    } catch (error) {
+        console.log(error)
+    }    
+}
+

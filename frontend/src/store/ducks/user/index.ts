@@ -8,7 +8,7 @@ const INITIAL_STATE: UserState = {
     userList: [] as User[],
     userSelected: null,
     token: '',
-    error: false,
+    error: null,
     loading: false
 }
 
@@ -21,6 +21,7 @@ const reducer: Reducer<UserState> = (state = INITIAL_STATE, action) => {
         case UserTypes.LOGIN_REQUEST:
         case UserTypes.READONE_REQUEST:
         case UserTypes.TOKEN_AUTHENTICATE:  
+        case UserTypes.CHANGE_PHOTOPROFILE:  
           return { ...state, loading: true };
 
         case UserTypes.LOGIN_SUCCESS:
@@ -30,7 +31,7 @@ const reducer: Reducer<UserState> = (state = INITIAL_STATE, action) => {
           };
         case UserTypes.LOGIN_FAILURE:
           return {
-          ...state, loading: false, error: true, user: null,
+          ...state, loading: false, error: action.payload.error, user: null,
           };                 
         case UserTypes.TOKEN_AUTHENTICATE_SUCCESS:
           
@@ -39,23 +40,22 @@ const reducer: Reducer<UserState> = (state = INITIAL_STATE, action) => {
           };
 
         case UserTypes.READONE_SUCCESS:
-          
+          console.log(action.payload.user)          
           return {
-          ...state, loading: true, userSelected: action.payload.user
+            ...state, 
+            loading: false, 
+            userSelected: action.payload.user,
+            user: action.payload.user.idUser == state.user?.idUser ? {
+              ...state.user,
+              photoProfileUser: action.payload.user.photoProfileUser
+            } : state.user
           };
 
         case UserTypes.TOKEN_AUTHENTICATE_ERROR:
           Router.replace('/login')
           return {
             ...state, loading: false
-          }
-        case UserTypes.CHANGE_THEME:
-          const user = state.user as User
-          user.themeActive = user.themeActive == 'dark' ?  'light' : 'dark'
-          return {
-            ...state,
-            user
-          }
+          }       
         case UserTypes.READLIST_REQUEST:
           return {
             ...state, loading: true, userList: []

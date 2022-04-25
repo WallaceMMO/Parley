@@ -3,99 +3,99 @@ import {useDispatch, useSelector} from 'react-redux'
 
 import { InputText } from "../SectionCreateDebate/styles"
 
-import { User } from "../../../store/ducks/user/types"
 
 import * as NotificationGroupActions from '../../../store/ducks/notificationGroup/actions'
-import * as NotificationActions from '../../../store/ducks/notification/actions'
-import * as GroupActions from '../../../store/ducks/group/actions'
-import * as UserActions from '../../../store/ducks/user/actions'
+import * as GroupsActions from '../../../store/ducks/group/actions'
 
-import {NotificationType} from '../../../store/ducks/notification/types'
+import {NotificationStatus} from '../../../store/ducks/notification/types'
+import {NotificationGroupType} from '../../../store/ducks/notificationGroup/types'
 
 import  {
     Container,
 
-    ContainerItem,
-    ButtonInvite,
-    ButtonSolicit,
     CellTable,
     HeaderTable,
     RowTable,
     TableMembers
 } from './styles'
 
-import api from '../../../services/api'
-import NotificationsRecruit from '../../molecules/NotificationsRecruit'
 import Button from '../../atoms/Button'
 import TabNavigation from '../TabNavigation'
-import TableListGroups from '../TableListGroups'
-
-interface PropsItemUser {
-    user: User
-    handleSendNotification: (userId: number) => void
-}
-
-const ItemUser = ({user, handleSendNotification}: PropsItemUser) => {
-    return (
-        <ContainerItem>
-            <h4>{user.nameUser}</h4>
-
-            <ButtonInvite onClick={() => handleSendNotification(user.idUser)}>Convidar</ButtonInvite>
-        </ContainerItem>
-    )
-}
 
 const Recruit = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch()    
+
     const [selectedTab, setSelectedTab] = useState('Usuários')
 
-    const group = useSelector(state => state.groupReducer.group)
-    const user = useSelector(state => state.userReducer.user)
+    const group = useSelector(state => state.groupReducer.groupSelected)
 
-    const groups = useSelector(state => state.groupReducer.groups)
-
-    const userList = useSelector(state => state.userReducer.userList)
-        .filter(user => {
-            const patentMemberUser = user.patentMembersUser.find(patentMember => patentMember.groupPatentMember?.idGroup == group?.idGroup ?? 0)
-            return user.patentMembersUser.length && patentMemberUser ? patentMemberUser.groupPatentMember?.idGroup != group?.idGroup ?? 0 : true
-        }) || null        
-
+    const user = useSelector(state => state.userReducer.user)    
+    const usersRecruit = useSelector(state => state.groupReducer.usersRecruit)
+    const usersSolicitation = useSelector(state => state.groupReducer.usersSolicitation)
+    const groupsInvites = useSelector(state => state.groupReducer.groupsInvites)
+    const groupsRecruit = useSelector(state => state.groupReducer.groupsRecruit)
+    
     useEffect(() => {
-        dispatch(UserActions.readListRequest())        
-    }, [group])
-        
-    useEffect(() => {
-        if(selectedTab == 'Grupos')
-            dispatch(GroupActions.loadRequest())
-        else if(selectedTab == 'Usuários')
-            dispatch(UserActions.readListRequest())
-    }, [selectedTab])
-
-    function handleSendNotification(userId: number) {
-        if(group)
-            dispatch(NotificationActions.createNotificationRequest({
+        if(selectedTab == 'Grupos' && group)
+            dispatch(GroupsActions.loadGroupsRecruitRequest(group.idGroup))
+        else if(selectedTab == 'Usuários' && group)
+            dispatch(GroupsActions.loadUsersRecruitRequest({
                 idGroup: group.idGroup,
-                idUser: userId,
-                typeNotification: NotificationType.USERSOLICITATION
+                typeNotificationGroup: NotificationGroupType.INVITEFORUSER,
+                statusNotificationGroup: NotificationStatus.WAITING
             }))
+        else if(selectedTab == 'Solicitações' && group) {            
+            dispatch(GroupsActions.loadUsersSolicitationRequest({
+                idGroup: group.idGroup,
+                statusNotificationGroup: NotificationStatus.WAITING
+            }))
+        } else if(selectedTab == 'Convites' && group) {
+            dispatch(GroupsActions.loadGroupsInviteRequest({
+                idGroup: group.idGroup,
+                statusNotificationGroup: NotificationStatus.WAITING
+            }))
+        }
+
+    }, [selectedTab, group])
+
+    async function handleSendNotification(userId: number) {
+        if(group && user) {          
+            dispatch(NotificationGroupActions.createNotificationRequest({
+                idFromUser: user.idUser,
+                typeNotificationGroup: NotificationGroupType.INVITEFORUSER,
+                idForUser: userId,
+                idFromGroup: group.idGroup
+            }))                  
+        }
     }
 
-     function handleSendNotificationGroup(forGroupId: number) {
-        if(group && user)
+    async function handleSendNotificationGroup(forGroupId: number) {
+        if(group && user) {
             dispatch(NotificationGroupActions.createNotificationRequest({
-                idUser: user.idUser,
                 idForGroup: forGroupId,
-                typeNotificationGroup: NotificationType.GROUPSOLICITATION,
-                idFromGroup: group.idGroup
+                idFromUser: user.idUser,
+                typeNotificationGroup: NotificationGroupType.INVITEFORGROUP,
+                idFromGroup: group.idGroup                
+            }))                                    
+        }                  
+    }    
+
+    async function handleAcceptNotificationGroup(idNotificationGroup: number, typeNotificationGroup: NotificationGroupType) {
+        if(group) {
+            dispatch(NotificationGroupActions.AcceptNotificationGroupRequest({
+                idNotificationGroup,
+                typeNotificationGroup,
+                idGroup: group.idGroup
             }))
-    }
+        }
+    }  
 
     return (
         <Container>
             <InputText />
 
             <TabNavigation 
-                names={['Usuários', 'Grupos']}
+                names={['Usuários', 'Grupos', 'Solicitações', 'Convites']}
                 selectedIndex={selectedTab}
                 setSelectedIndex={setSelectedTab}
             />
@@ -112,7 +112,7 @@ const Recruit = () => {
                     </thead>
                     <tbody>
                         {
-                            userList.map(user => {
+                            usersRecruit?.map(user => {
                                 
                                 return (
                                     <RowTable key={user.idUser}>
@@ -125,11 +125,21 @@ const Recruit = () => {
                                         <CellTable>
                                             {0}
                                         </CellTable>
-                                        <CellTable>
-                                            <Button 
-                                                content='Convidar'
-                                                onClick={() => handleSendNotification(user.idUser)}
-                                            />
+                                        <CellTable>                                            
+                                            {
+                                                !user.forNotificationsGroupUser?.length ? (
+                                                    <Button 
+                                                        content='Convidar'
+                                                        onClick={() => handleSendNotification(user.idUser)}
+                                                    />
+                                                ) : (
+                                                    <Button 
+                                                        content='Esperando'
+                                                        onClick={() => {}}
+                                                    />
+                                                )
+                                            }
+                                            
                                         </CellTable>
                                     </RowTable>
                                 )
@@ -151,7 +161,7 @@ const Recruit = () => {
                 </thead>
                 <tbody>
                     {
-                        groups.map(group => {
+                        groupsRecruit?.map(group => {
                             
                             return (
                                 <RowTable>
@@ -165,10 +175,20 @@ const Recruit = () => {
                                         {group.debatesMade}
                                     </CellTable>
                                     <CellTable>
-                                        <Button 
-                                            content='Convidar'
-                                            onClick={() => handleSendNotificationGroup(group.idGroup)}
-                                        />
+                                        {
+                                            !group.forGlobalNotificationsGroup?.length ? (
+                                                <Button 
+                                                    content='Convidar'
+                                                    onClick={() => handleSendNotificationGroup(group.idGroup)}
+                                                />
+                                            ) : (
+                                                <Button 
+                                                    content='Esperando'
+                                                    onClick={() => {}}
+                                                />
+                                            )
+                                        }
+                                       
                                     </CellTable>
                                 </RowTable>
                             )
@@ -177,9 +197,86 @@ const Recruit = () => {
                     </tbody>
             </TableMembers>
 
+            }            
+
+            {
+                selectedTab == 'Solicitações' && <TableMembers>
+                    <thead>
+                    <RowTable>
+                        <HeaderTable>Nome</HeaderTable>
+                        <HeaderTable>Honra</HeaderTable>
+                        <HeaderTable>Debates Feitos</HeaderTable>
+                        <HeaderTable>Situação</HeaderTable>
+                    </RowTable>     
+                    </thead>
+                    <tbody>
+                        {
+                            usersSolicitation?.map(user => {
+                                
+                                return (
+                                    <RowTable key={user.idUser}>
+                                        <CellTable>
+                                            <h4>{user.nameUser}</h4>
+                                        </CellTable>
+                                        <CellTable>
+                                            {0}
+                                        </CellTable>
+                                        <CellTable>
+                                            {0}
+                                        </CellTable>
+                                        <CellTable>
+                                            <Button 
+                                                content='Aceitar'
+                                                onClick={() => handleAcceptNotificationGroup(user.fromNotificationsGroupUser[0].idNotificationGroup, NotificationGroupType.SOLICITATIONFORGROUP)}
+                                            />
+                                        </CellTable>
+                                    </RowTable>
+                                )
+                            })
+                        }     
+                    </tbody>
+                </TableMembers>            
+            }
+
+            {
+                selectedTab == 'Convites' && <TableMembers>
+                    <thead>
+                    <RowTable>
+                        <HeaderTable>Nome</HeaderTable>
+                        <HeaderTable>Honra</HeaderTable>
+                        <HeaderTable>Debates Feitos</HeaderTable>
+                        <HeaderTable>Situação</HeaderTable>
+                    </RowTable>     
+                    </thead>
+                    <tbody>
+                        {
+                            groupsInvites?.map(group => {
+                                
+                                return (
+                                    <RowTable key={group.idGroup}>
+                                        <CellTable>
+                                            <h4>{group.nameGroup}</h4>
+                                        </CellTable>
+                                        <CellTable>
+                                            {0}
+                                        </CellTable>
+                                        <CellTable>
+                                            {0}
+                                        </CellTable>
+                                        <CellTable>
+                                            <Button 
+                                                content='Aceitar'
+                                                onClick={() => handleAcceptNotificationGroup(group.fromGlobalNotificationsGroup[0].idNotificationGroup, NotificationGroupType.INVITEFORGROUP)}
+                                            />
+                                        </CellTable>
+                                    </RowTable>
+                                )
+                            })
+                        }     
+                    </tbody>
+                </TableMembers>            
             }
                                 
-            <NotificationsRecruit />
         </Container>
     )
 }

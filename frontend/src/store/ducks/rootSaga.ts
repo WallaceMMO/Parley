@@ -1,19 +1,19 @@
 import {all, takeLatest} from 'redux-saga/effects'
 
 import {UserTypes} from './user/types'
-import {login, readList, readOneUser, register, verifyToken} from './user/saga'
+import {changePhotoProfileUser, login, readList, readOneUser, register, verifyToken} from './user/saga'
 
 import {DebateTypes} from './debate/types'
 import {addMessage, createDebate, FindByGroupDebate, FindByUserDebate, loadOneDebate, read} from './debate/saga'
 
 import { GroupTypes } from './group/types'
-import { createGroup, FindByUserGroups, loadGroups, loadOne, outputMessage, refreshMessages, solicitGroup } from './group/saga'
+import { createGroup, FindByUserGroups, loadGroups, loadGroupSelected, loadGroupsInvite, loadGroupsRecruit, loadUsersRecruit, loadUsersSolicitation, outputMessage, refreshMessages, solicitGroup } from './group/saga'
 
 import {NotificationTypes} from './notification/types'
-import {acceptDebateNotification, getUnreadNotification, loadNotifications} from './notification/saga'
+import {acceptDebateNotification, acceptGroupNotification, FindByUserWithoutGroup, createNotification, FindByUserSolicitationNotifications, getUnreadNotification, loadNotifications} from './notification/saga'
 
 import {NotificationGroupTypes} from './notificationGroup/types'
-import {FindByGroupNotificationsGroup, createNotificationGroup} from './notificationGroup/saga'
+import {createNotificationGroup, AcceptNotificationGroup, LoadNotificationsGroupByGroup, LoadNotificationsGroupByUser, ReturnGroupsByNotificationGroup, ReturnUsersByNotificationGroup, RejectNotificationGroup} from './notificationGroup/saga'
 
 export default function* rootSaga() {
     // @ts-ignore
@@ -27,6 +27,8 @@ export default function* rootSaga() {
         takeLatest(UserTypes.READLIST_REQUEST, readList),
 
         takeLatest(UserTypes.READONE_REQUEST, readOneUser),
+
+        takeLatest(UserTypes.CHANGE_PHOTOPROFILE, changePhotoProfileUser),
 
 
         takeLatest(DebateTypes.READ_REQUEST, read),
@@ -42,9 +44,17 @@ export default function* rootSaga() {
         takeLatest(DebateTypes.FINDBYUSER_DEBATE, FindByUserDebate),
         
 
-        takeLatest(GroupTypes.LOAD_GROUPS, loadGroups),
+        takeLatest(GroupTypes.REQUEST_LOAD_GROUPS, loadGroups),
 
-        takeLatest(GroupTypes.LOAD_ONE_REQUEST, loadOne),
+        takeLatest(GroupTypes.REQUEST_LOAD_GROUPSELECTED, loadGroupSelected),
+
+        takeLatest(GroupTypes.REQUEST_LOAD_GROUPSINVITES, loadGroupsInvite),
+
+        takeLatest(GroupTypes.REQUEST_LOAD_GROUPSRECRUIT, loadGroupsRecruit),
+
+        takeLatest(GroupTypes.REQUEST_LOAD_USERSRECRUIT, loadUsersRecruit),
+
+        takeLatest(GroupTypes.REQUEST_LOAD_USERSSOLICITATION, loadUsersSolicitation),
 
         takeLatest(GroupTypes.CREATEGROUP_REQUEST, createGroup),
 
@@ -59,12 +69,30 @@ export default function* rootSaga() {
 
         takeLatest(NotificationTypes.ACCEPTDEBATE_REQUEST, acceptDebateNotification),
 
+        takeLatest(NotificationTypes.CREATE_REQUEST, createNotification),
+
+        takeLatest(NotificationTypes.FINDBYUSERSOLICITATION_REQUEST, FindByUserSolicitationNotifications),
+
+        takeLatest(NotificationTypes.FINDBYUSERWITHOUTGROUP_REQUEST, FindByUserWithoutGroup),
+    
+        takeLatest(NotificationTypes.ACCEPTGROUP_REQUEST, acceptGroupNotification),
+
         takeLatest(NotificationTypes.GETUNREAD_REQUEST, getUnreadNotification),
 
 
-        takeLatest(NotificationGroupTypes.FINDBYGROUP_NOTIFICATIONSGROUP, FindByGroupNotificationsGroup),
+        takeLatest(NotificationGroupTypes.CREATE_NOTIFICATIONGROUP, createNotificationGroup),
         
-        takeLatest(NotificationGroupTypes.CREATE_REQUEST, createNotificationGroup)        
+        takeLatest(NotificationGroupTypes.LOAD_NOTIFICATIONSBYGROUP, LoadNotificationsGroupByGroup),
+        
+        takeLatest(NotificationGroupTypes.LOAD_NOTIFICATIONSBYUSER, LoadNotificationsGroupByUser),
+        
+        takeLatest(NotificationGroupTypes.RETURN_GROUPSBYNOTIFICATIONGROUP, ReturnGroupsByNotificationGroup),
+        
+        takeLatest(NotificationGroupTypes.RETURN_USERSBYNOTIFICATIONGROUP, ReturnUsersByNotificationGroup),
+
+        takeLatest(NotificationGroupTypes.ACCEPT_NOTIFICATIONGROUP, AcceptNotificationGroup),
+
+        takeLatest(NotificationGroupTypes.REJECT_NOTIFICATIONGROUP, RejectNotificationGroup)
     ])
 }
 

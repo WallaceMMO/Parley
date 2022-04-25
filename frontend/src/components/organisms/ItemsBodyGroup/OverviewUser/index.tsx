@@ -11,8 +11,8 @@ const OverviewUser = () => {
         <Container>
             <h5>{userSelected?.descriptionUser}</h5>
 
-            <h5>{userSelected?.mostViewedDebate?.titleDebate}</h5>
-            <h5>Debates já feito {userSelected?.madeDebates}</h5>
+            <h5>Debate mais visto: {userSelected?.mostViewedDebate?.titleDebate}</h5>
+            <h5>Debates já feito: {userSelected?.madeDebates}</h5>
         </Container>
     )
 }

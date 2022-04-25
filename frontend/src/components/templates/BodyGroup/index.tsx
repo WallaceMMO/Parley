@@ -11,8 +11,11 @@ import DebatesMade from '../../organisms/ItemsBodyGroup/DebatesMade'
 import * as DebatesActions from '../../../store/ducks/debate/actions'
 
 import {
-    Container
+    Container,
+    BodyItems
 } from './styles'
+import SideBarOptions from '../../organisms/SideBarOptions'
+import NotificationsGroup from '../../organisms/ItemsBodyGroup/NotificationsGroup'
 
 
 const BodyGroup = () => {   
@@ -21,7 +24,7 @@ const BodyGroup = () => {
     const [tabs, setTabs] = useState<string[]>([])
 
     const user = useSelector(state => state.userReducer.user) || null
-    const group = useSelector(state => state.groupReducer.group)            
+    const group = useSelector(state => state.groupReducer.groupSelected)            
     const debates = useSelector(state => state.debateReducer.debates) || null    
 
     useEffect(() => {
@@ -32,7 +35,7 @@ const BodyGroup = () => {
     useEffect(() => {
         if(user && group) {
             if(user?.patentMembersUser.find(patent => patent.groupPatentMember?.idGroup == group?.idGroup)) {
-                setTabs(['Chat', 'Debates do grupo','Integrantes', 'Visão Geral', 'Administração' ])
+                setTabs(['Chat', 'Debates do grupo','Integrantes', 'Visão Geral', 'Administração', 'Notificações' ])
             } else {
                 setTabs(['Debates do grupo','Integrantes', 'Visão Geral'])
             }
@@ -41,31 +44,37 @@ const BodyGroup = () => {
 
     return (
         <Container>
-            <TabNavigation 
+            <SideBarOptions 
                 selectedIndex={selectedTab}
                 setSelectedIndex={setSelectedTab}
                 names={tabs}
             />            
 
-            { 
-                selectedTab == 'Chat' && user?.patentMembersUser.find(patent => patent.groupPatentMember?.idGroup == group?.idGroup) && <ChatGroup />
-            }
+            <BodyItems>
+                { 
+                    selectedTab == 'Chat' && user?.patentMembersUser.find(patent => patent.groupPatentMember?.idGroup == group?.idGroup) && <ChatGroup />
+                }
 
-            { 
-                selectedTab == 'Debates do grupo' && <DebatesMade debates={debates}/>
-            }
+                { 
+                    selectedTab == 'Debates do grupo' && <DebatesMade debates={debates}/>
+                }
 
-            { 
-                selectedTab == 'Integrantes' && <Members />
-            }
+                { 
+                    selectedTab == 'Integrantes' && <Members />
+                }
 
-            { 
-                selectedTab == "Visão Geral" && <Overview />
-            }
+                { 
+                    selectedTab == "Visão Geral" && <Overview />
+                }
 
-            { 
-                selectedTab == 'Administração' && user?.patentMembersUser.find(patent => patent.groupPatentMember?.idGroup == group?.idGroup) && <Recruit />
-            }
+                { 
+                    selectedTab == 'Administração' && user?.patentMembersUser.find(patent => patent.groupPatentMember?.idGroup == group?.idGroup) && <Recruit />
+                }
+
+                { 
+                    selectedTab == 'Notificações' && user?.patentMembersUser.find(patent => patent.groupPatentMember?.idGroup == group?.idGroup) && <NotificationsGroup />
+                }
+            </BodyItems>
         </Container>
     )
 }

@@ -20,39 +20,33 @@ import { Notification } from './Notification';
 import { SideDebate } from './SideDebate';
 
 import { ItemChat } from './ItemChat';
-import { IsInt } from 'class-validator';
 import { ViewsDebate } from './ViewsDebate';
 import { NotificationGroup } from './NotificationGroup';
 
+import { IsEmail, IsInt, IsNotEmpty, MinLength } from 'class-validator';
 @Entity()
 export class User extends BaseEntity{   
-    @PrimaryGeneratedColumn()
-    @IsInt()
+    @PrimaryGeneratedColumn()    
     idUser: number 
 
     @Column()
+    @IsNotEmpty()
+    @MinLength(1)
     nameUser: string;
 
     @Column()
-    descriptionUser: string
-
-    @Column()
-    gloryUser: number
-
-    @Column()
-    honorUser: number
-
-    @Column()
-    activityUser: Date
+    descriptionUser: string            
     
     @Column()
+    @IsNotEmpty()
+    @MinLength(1)  
+    @IsEmail()  
     emailUser: string;
 
     @Column()
-    passwordUser: string;
-
-    @Column()
-    followersUser: number
+    @IsNotEmpty()
+    @MinLength(6)    
+    passwordUser: string;    
     
     @Column("longblob", {nullable: true})
     photoProfileUser: Buffer    
@@ -81,8 +75,11 @@ export class User extends BaseEntity{
     @OneToMany(type => Notification, notification => notification.forUserNotification)
     forNotificationsUser: Notification[]
 
-    @OneToMany(type => NotificationGroup, notification => notification.userNotificationGroup)
-    notificationsGroupUser: NotificationGroup[]
+    @OneToMany(type => NotificationGroup, notification => notification.forUserNotificationGroup)
+    forNotificationsGroupUser: NotificationGroup[]
+
+    @OneToMany(type => NotificationGroup, notification => notification.fromUserNotificationGroup)
+    fromNotificationsGroupUser: NotificationGroup[]
 
     @ManyToMany(type => User, user => user.userFavorites)
     userStarred: User[]

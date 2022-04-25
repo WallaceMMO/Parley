@@ -62,7 +62,6 @@ class ItemChatController {
             const { messageItemChat, groupItemChat, userItemChat } =
               request.body.itemChat as ItemChat;                            
     
-              console.log(request.body)
             if(!messageItemChat) {
                 return response.send({error: "messageItemChat undefined"})
             }

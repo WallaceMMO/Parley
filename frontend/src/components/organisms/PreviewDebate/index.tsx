@@ -32,6 +32,9 @@ const PreviewDebate: NextPage<Props> = ({debate}) => {
     function handleForward() {
         Router.push(`/debate/${debate.idDebate}`)
     }
+    
+    console.log(debate)
+
     return (
         <Container onClick={handleForward}>
             <SectionHeader>

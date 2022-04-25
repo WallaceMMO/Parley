@@ -32,6 +32,20 @@ const reducer: Reducer<DebateState> = (state = INICIAL_STATE, action) => {
             debates: debates,            
             debateSelected: debates[0]          
           };
+
+          case DebateTypes.CONCAT_DEBATES:
+          const debatesConcat: Debate[] = action.payload.debates
+
+          debatesConcat.map(debate => {
+            debate.updated_at = new Date(debate.updated_at)
+            debate.created_at = new Date(debate.created_at)
+
+            return debate
+          })
+          return {
+            ...state, loading: false, error: false, 
+            debates: [...state.debates, ...debatesConcat]                        
+          };
         case DebateTypes.READ_FAILURE:
           return {
           ...state, loading: false, error: true, debates: [] as Debate[],
@@ -46,7 +60,6 @@ const reducer: Reducer<DebateState> = (state = INICIAL_STATE, action) => {
           const debate = state.debateSelected
           debate?.messagesDebate.push(action.payload.message)
 
-          console.log("messagesDebate", debate?.messagesDebate)
           return {
             ...state, loading: true, error: false, debateSelected: {
               ...debate,

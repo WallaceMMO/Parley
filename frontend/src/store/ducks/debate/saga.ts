@@ -1,16 +1,19 @@
 import {call, put} from 'redux-saga/effects'
 import {AxiosResponse} from 'axios'
 import api from '../../../services/api'
-import {readFailure, readRequest, readSuccess, createRequest, loadOneRequest, addMessageRequest, addMessageSuccess, FindByGroupRequest, FindByUserRequest} from './actions'
+import {readFailure, readRequest, readSuccess, createRequest, loadOneRequest, addMessageRequest, addMessageSuccess, FindByGroupRequest, FindByUserRequest, concatDebates} from './actions'
 import {Debate, DebateTypes} from './types'
 
-export function* read() {
+export function* read({payload: {skip}}: ReturnType<typeof readRequest>) {
     try {
-        const response: AxiosResponse = yield call(api.get, "debate/read");
+        const response: AxiosResponse = yield call(api.get, `debate/read?page=${skip}`);
         if(response.data.error)
         throw response.data.error
         
-        yield put(readSuccess(response.data.debates))
+        if(skip == 1)
+            yield put(readSuccess(response.data.debates))
+        else
+            yield put(concatDebates(response.data.debates))
     } catch (err) {
         yield put(readFailure(String(err)))
     }
@@ -18,8 +21,7 @@ export function* read() {
 
 export function* createDebate({ payload: {
     firstArgument,
-    rounds,    
-    time,
+    rounds,        
     titleDebate,
     conDebate,
     proDebate,
@@ -30,8 +32,7 @@ export function* createDebate({ payload: {
         const response: AxiosResponse = yield call(api.post, "debate/save", {
             debate: {
                 titleDebate,                                 
-                roundsDebate: rounds,
-                timeToArgueDebate: time,
+                roundsDebate: rounds,                
                 conDebate,
                 proDebate,
                 side  
@@ -45,7 +46,7 @@ export function* createDebate({ payload: {
         if(response.data.error)
         throw response.data.error
         
-        yield put(readSuccess([response.data.debate]))
+        yield put(readRequest(1))
     } catch (err) {
         console.log(err)
     }

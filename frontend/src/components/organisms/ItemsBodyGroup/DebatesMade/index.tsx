@@ -13,6 +13,7 @@ interface PropsDebateMade {
 }
 const DebatesMade = ({debates}: PropsDebateMade) => {    
     
+    
     return (
         <Container>
             {

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-    padding: 0 15px;
+    padding: 15px;
 
     display: flex;
     flex-direction: column;
@@ -11,7 +11,7 @@ export const Container = styled.div`
 export const TableMembers = styled.table`
     border-collapse: collapse;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 5px;
 `
 
 export const RowTable = styled.tr`
@@ -41,4 +41,8 @@ export const CellTable = styled.td`
     
     border-bottom: 1px solid gray;
     padding: 8px;
+`
+
+export const TitleGroup = styled.h3`
+    margin-top: 2rem;
 `

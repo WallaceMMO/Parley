@@ -7,6 +7,8 @@ import * as UserActions from '../../store/ducks/user/actions'
 import * as DebateActions from '../../store/ducks/debate/actions'
 import * as GroupActions from '../../store/ducks/group/actions'
 
+import {Group} from '../../store/ducks/group/types'
+
 import Header from "../../components/templates/Header";
 
 import OverviewUser from "../../components/organisms/ItemsBodyGroup/OverviewUser";
@@ -15,6 +17,7 @@ import TabNavigation from "../../components/organisms/TabNavigation";
 import DebatesMade from "../../components/organisms/ItemsBodyGroup/DebatesMade";
 import ListGroups from "../../components/organisms/ListGroups";
 import TableListGroups from "../../components/organisms/TableListGroups";
+import MainProfile from "../../components/templates/MainProfile";
 
 export const getStaticProps: GetStaticProps = async (context) => {
     const id = context.params?.id
@@ -46,7 +49,9 @@ const UserDetail: NextPage<Props> = ({id}) => {
 
     const debates = useSelector(state => state.debateReducer.debates)
 
-    const groups = useSelector(state => state.groupReducer.groups)
+    const user = useSelector(state => state.userReducer.userSelected)
+
+    const groups = user?.patentMembersUser?.map(patent => patent.groupPatentMember as Group) ?? []
 
     const tabs = ['Visão Geral', 'Debates', 'Grupos']
 
@@ -56,35 +61,40 @@ const UserDetail: NextPage<Props> = ({id}) => {
 
     useEffect(() => {
         if(selectedIndex == 'Debates')
-            dispatch(DebateActions.FindByUserRequest(parseInt(id)))
-        else if(selectedIndex == 'Grupos')
-            dispatch(GroupActions.FindByUserRequest(parseInt(id)))
-    }, [selectedIndex])    
+            dispatch(DebateActions.FindByUserRequest(parseInt(id)))    
+    }, [selectedIndex])
 
-    console.log(groups)
     return (
         <Container>            
             <Header />
             
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '78%',
+                marginTop: 26
+            }}>
+            <MainProfile />
             <ContainerItem>
-                <TabNavigation 
-                    selectedIndex={selectedIndex}
-                    names={tabs}
-                    setSelectedIndex={setSelectedIndex}
-                />
-                
-                {
-                    selectedIndex == 'Visão Geral' && <OverviewUser />
-                }
+                    <TabNavigation 
+                        selectedIndex={selectedIndex}
+                        names={tabs}
+                        setSelectedIndex={setSelectedIndex}
+                    />
+                    
+                    {
+                        selectedIndex == 'Visão Geral' && <OverviewUser />
+                    }
 
-                {
-                    selectedIndex == 'Debates' && <DebatesMade debates={debates}/>
-                }
+                    {
+                        selectedIndex == 'Debates' && <DebatesMade debates={debates}/>
+                    }
 
-                {
-                    selectedIndex == 'Grupos' && <TableListGroups groups={groups}/>
-                }
+                    {
+                        selectedIndex == 'Grupos' && <TableListGroups groups={groups}/>
+                    }
             </ContainerItem>
+            </div>
         </Container>
     )
     
@@ -97,11 +107,11 @@ export const Container = styled.div`
 `;
 
 export const ContainerItem = styled.div`
-  width: 78%;
+  width: 100%;
   height: 645px;
 
   background-color: ${({theme}) => theme.white};
-  margin-top: 26px;
+  margin-left: 10px;
   display: flex;
   flex-direction: column;
 `

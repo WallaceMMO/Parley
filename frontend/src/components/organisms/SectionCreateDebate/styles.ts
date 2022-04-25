@@ -31,11 +31,14 @@ export const InputText = styled.input`
 `
 
 export const InputTextArea = styled.textarea`
-
+   font-size: 16px;
+   height: 25px;
+   border-radius: 5px;
+   padding-left: 5px;
+   border: 1px solid #ccc;   
 `
 
-export const Button = styled.button`
-    margin-top: 15px;    
+export const Button = styled.button`        
     height: 30px;
     cursor: pointer;
     border-radius: 5px;
