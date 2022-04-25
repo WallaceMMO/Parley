@@ -29,11 +29,7 @@ export interface User {
 
     nameUser: string;
 
-    descriptionUser: string    
-
-    gloryUser: number
-
-    honorUser: number
+    descriptionUser: string        
 
     activityUser: Date
     
